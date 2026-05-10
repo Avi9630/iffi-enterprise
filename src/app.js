@@ -47,4 +47,8 @@ app.use((req, res) => {
 //     });
 // });
 
+// errorMiddleware
+import errorMiddleware from '../src/middleware/errorHandler.js';
+app.use(errorMiddleware);
+
 export default app;
