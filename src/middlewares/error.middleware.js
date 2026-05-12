@@ -1,11 +1,11 @@
-import logger from '../config/logger.js';
-import env from '../config/env.js';
+import logger from '../configs/logger.js';
+import env from '../configs/env.js';
 
 const errorHandler = (err, req, res, next) => {
+
     err.statusCode = err.statusCode || 500;
     err.status = err.status || 'error';
 
-    // ✅ Log error using winston
     logger.error({
         message: err.message,
         stack: err.stack,
@@ -17,7 +17,7 @@ const errorHandler = (err, req, res, next) => {
 
     if (env.NODE_ENV === 'development') {
         return res.status(err.statusCode).json({
-            success: false,
+            status: false,
             message: err.message,
             stack: err.stack,
             error: err,

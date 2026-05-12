@@ -1,8 +1,10 @@
-// import prisma from "./config/database.js";
-import prisma from './config/db.js'
+import logger from "./configs/logger.js";
+import prisma from './configs/prisma.js'
+import env from "./configs/env.js";
+import dotenv from 'dotenv';
 import app from "./app.js";
-import env from "./config/env.js";
-import logger from "./config/logger.js";
+
+dotenv.config();
 
 const PORT = env.PORT;
 
@@ -18,6 +20,7 @@ async function startServer() {
         });
 
         const gracefulShutdown = async (signal) => {
+
             logger.info(`${signal} received. Starting graceful shutdown...`);
 
             server.close(async () => {

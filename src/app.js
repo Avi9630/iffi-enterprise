@@ -27,12 +27,7 @@ app.get('/', (req, resp) => {
 // authRoutes
 app.use('/api', apiRoutes);
 
-// errorMiddleware
-// import errorMiddleware from './middlewares/error.middleware.js';
-// app.use(errorMiddleware);
-
 // ✅ 404 Handler (must be after all routes)
-
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -48,7 +43,7 @@ app.use((req, res) => {
 // });
 
 // errorMiddleware
-import errorMiddleware from '../src/middleware/errorHandler.js';
+import errorMiddleware from '../src/middlewares/error.middleware.js';
 app.use(errorMiddleware);
 
 export default app;

@@ -1,6 +1,8 @@
 import Joi from "joi";
 import dotenv from 'dotenv';
 
+dotenv.config();
+
 const envSchema = Joi.object({
     NODE_ENV: Joi.string()
         .valid('development', 'production', 'test')

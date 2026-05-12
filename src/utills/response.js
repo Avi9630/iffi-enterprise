@@ -31,4 +31,11 @@ const sendPaginated = (res, data, pagination, message = 'Success') => {
     });
 };
 
-export default { sendSuccess, sendError, sendPaginated }
+const ApiResponse = (res, statusCode, data) => {
+    return res.status(statusCode).json({
+        success: statusCode < 400,
+        ...data
+    });
+};
+
+export default { sendSuccess, sendError, sendPaginated, ApiResponse }
