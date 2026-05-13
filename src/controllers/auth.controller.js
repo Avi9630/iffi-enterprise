@@ -4,6 +4,7 @@ import clientService from '../services/client.service.js';
 import ApiResponse from '../utills/ApiResponse.js';
 import AppError from '../utills/AppError.js';
 import { sendMail } from '../mail/mailer.js';
+import prisma from '../configs/prisma.js';
 
 class AuthController {
 
@@ -142,6 +143,22 @@ class AuthController {
         } catch (error) {
             return next(error);
         }
+    }
+
+    async logout(req, res, next) {
+        await prisma.clients.update({
+            where: {
+                id: req.client.id
+            },
+            data: {
+                token: null
+            }
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Logged out successfully'
+        });
     }
 
 }

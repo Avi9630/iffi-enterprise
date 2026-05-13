@@ -7,7 +7,7 @@ const ApiResponse = (res, statusCode, data) => {
     );
 
     return res.status(statusCode).json({
-        success: statusCode < 400,
+        status: statusCode < 400,
         ...sanitizedData
     });
 };

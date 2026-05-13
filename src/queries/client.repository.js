@@ -1,6 +1,9 @@
 import AppError from '../utills/AppError.js';
 import prisma from '../configs/prisma.js';
 
+const CACHE_TTL = 3600; // 1 hour in seconds
+const cache = new Map();
+
 class ClientRepository {
     async create(data) {
         try {
@@ -63,6 +66,40 @@ class ClientRepository {
         return await prisma.clients.delete({
             where: { id }
         });
+    }
+
+    async clientList() {
+        return this._getCached('clients', () =>
+            prisma.clients.findMany()
+        );
+    }
+
+    async _getCached(key, fetchFn, ttl = CACHE_TTL) {
+        const cached = cache.get(key);
+
+        if (cached && Date.now() < cached.expiry) {
+            return cached.data;
+        }
+
+        const data = await fetchFn();
+        cache.set(key, {
+            data,
+            expiry: Date.now() + (ttl * 1000)
+        });
+
+        return data;
+    }
+
+    clearCache(pattern) {
+        if (pattern) {
+            for (const key of cache.keys()) {
+                if (key.startsWith(pattern)) {
+                    cache.delete(key);
+                }
+            }
+        } else {
+            cache.clear();
+        }
     }
 }
 

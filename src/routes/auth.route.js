@@ -16,14 +16,4 @@ router
     .post('/verify-otp', validateRequest(authValidator.verifyOtpSchema), authController.verifyOtp)
     .post('/change-password', validateRequest(authValidator.changePasswordSchema), authController.changePassword)
 
-// POST /api/v1/auth/login
-// router.post(
-//     '/login',
-//     // validateRequest(loginSchema),
-//     // authController.login
-// );
-
-// POST /api/v1/auth/logout
-// router.post('/logout', authController.logout);
-
 export default router;

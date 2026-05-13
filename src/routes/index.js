@@ -1,10 +1,13 @@
-import express from 'express';
-
+import authenticatedRoutes from './authenticated.route.js'
 import authRoutes from './auth.route.js'
+import apiRoutes from './api.route.js';
+import express from 'express';
 
 const router = express.Router();
 
-router.use('/auth', authRoutes);
-// router.use('/users', userRoutes);
+router.use('/', authRoutes);
+router.use('/freepi', apiRoutes);
+router.use('/auth', authenticatedRoutes);
+
 
 export default router;
