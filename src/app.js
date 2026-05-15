@@ -1,12 +1,21 @@
+
+import errorMiddleware from '../src/middlewares/error.middleware.js';
+import apiRoutes from './routes/index.js';
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
 
-// Import routes
-import apiRoutes from './routes/index.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Static files - PUBLIC folder ko serve karein
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware
 app.use(cors());
@@ -43,7 +52,6 @@ app.use((req, res) => {
 // });
 
 // errorMiddleware
-import errorMiddleware from '../src/middlewares/error.middleware.js';
 app.use(errorMiddleware);
 
 export default app;

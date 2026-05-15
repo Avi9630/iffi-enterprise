@@ -448,15 +448,16 @@ model dd_international_film_festivals {
 }
 
 model documents {
-  id           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  context_id   BigInt    @db.UnsignedBigInt
-  website_type Int       @db.TinyInt
-  type         Int       @db.TinyInt
-  file         String    @db.VarChar(255)
-  name         String    @db.VarChar(255)
-  created_by   String?   @db.VarChar(255)
-  created_at   DateTime  @default(now()) @db.Timestamp(0)
-  updated_at   DateTime? @db.Timestamp(0)
+  id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  context_id    BigInt    @db.UnsignedBigInt
+  website_type  Int       @db.TinyInt
+  document_type Int       @db.TinyInt
+  doc_name      String    @db.VarChar(255)
+  modified_name String    @db.VarChar(255)
+  doc_path      String?   @db.Text
+  created_by    String?   @db.VarChar(255)
+  created_at    DateTime  @default(now()) @db.Timestamp(0)
+  updated_at    DateTime? @db.Timestamp(0)
 }
 
 model failed_jobs {
@@ -491,6 +492,7 @@ model ip_application_documents {
 
 model ip_application_forms {
   id                                        BigInt                     @id @default(autoincrement()) @db.UnsignedBigInt
+  form_id                                   String?                    @db.VarChar(255)
   step                                      Int?                       @db.TinyInt
   active_step                               Int?                       @db.TinyInt
   client_id                                 BigInt?                    @db.UnsignedBigInt
