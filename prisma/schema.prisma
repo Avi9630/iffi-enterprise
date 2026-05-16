@@ -458,6 +458,9 @@ model documents {
   created_by    String?   @db.VarChar(255)
   created_at    DateTime  @default(now()) @db.Timestamp(0)
   updated_at    DateTime? @db.Timestamp(0)
+
+  @@index([context_id], map: "fk_documents_application")
+  @@map("documents")
 }
 
 model failed_jobs {
@@ -492,7 +495,6 @@ model ip_application_documents {
 
 model ip_application_forms {
   id                                        BigInt                     @id @default(autoincrement()) @db.UnsignedBigInt
-  form_id                                   String?                    @db.VarChar(255)
   step                                      Int?                       @db.TinyInt
   active_step                               Int?                       @db.TinyInt
   client_id                                 BigInt?                    @db.UnsignedBigInt

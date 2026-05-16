@@ -2,19 +2,6 @@
 import prisma from '../configs/prisma.js';
 
 class DocumentRepository {
-    // async saveAndUpdate(uniqueId, data) {
-    //     try {
-    //         const document = await prisma.documents.upsert({
-    //             where: { id: uniqueId },
-    //             update: data,
-    //             create: { id: uniqueId, ...data }
-    //         });
-
-    //         return document;
-    //     } catch (error) {
-    //         throw new Error(`Upsert failed: ${error.message}`);
-    //     }
-    // }
 
     async saveAndUpdate(criteria, data) {
         try {
@@ -62,6 +49,21 @@ class DocumentRepository {
                 document_type: criteria.document_type
             }
         });
+    }
+
+    async deleteMany(ids) {
+        try {
+            return await prisma.documents.deleteMany({
+                where: {
+                    id: { in: ids }
+                }
+            });
+        } catch (error) {
+            if (error.code === 'P2025') {
+                throw new AppError('Documents not found.', 404);
+            }
+            throw new AppError('Failed to delete documents.', 500);
+        }
     }
 }
 

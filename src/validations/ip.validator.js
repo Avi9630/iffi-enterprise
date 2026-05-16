@@ -446,7 +446,9 @@ class IpValidator {
                 is: 0,
                 then: Joi.string().required(),
                 otherwise: Joi.optional()
-            })
+            }),
+
+            producer_id_proof: Joi.any()
         });
     }
 
@@ -456,6 +458,43 @@ class IpValidator {
             step: Joi.number()
                 .valid(constant.FORM_STEPS.DIRECTORS_DETAILS)
                 .required(),
+
+            director_name: Joi.string()
+                .trim()
+                .required(),
+
+            director_email: Joi.string()
+                .trim()
+                .email()
+                .required(),
+
+            director_landline: Joi.string()
+                .trim()
+                .allow('', null),
+
+            director_mobile: Joi.string()
+                .trim()
+                .required(),
+
+            director_fax: Joi.string()
+                .trim()
+                .allow('', null),
+
+            director_website: Joi.string()
+                .trim()
+                .uri()
+                .allow('', null),
+
+            director_address: Joi.string()
+                .trim()
+                .required(),
+
+            director_indian_natinality: Joi.number()
+                .valid(1)
+                .required(),
+
+            director_id_proof: Joi.any()
+
         });
     }
 
@@ -581,9 +620,11 @@ class IpValidator {
                     otherwise: Joi.optional()
                 }
             ),
+
             // Optional file fields
-            // file_cbfc_certificate: Joi.any(),
-            // uncensored_file: Joi.any(),
+            file_cbfc_certificate: Joi.any(),
+            declaration_clause_file: Joi.any(),
+            uncensored_file: Joi.any(),
         });
     }
 
@@ -685,6 +726,14 @@ class IpValidator {
             step: Joi.number()
                 .valid(constant.FORM_STEPS.DOCUMENTS)
                 .required(),
+
+            // Optional file fields
+            authorization_latter: Joi.any(),
+            declaration_latter: Joi.any(),
+            synopsis_in_english: Joi.any(),
+            directors_profile: Joi.any(),
+            producers_profile: Joi.any(),
+            details_of_cast_crew: Joi.any(),
         });
     }
 
@@ -693,6 +742,15 @@ class IpValidator {
 
             step: Joi.number()
                 .valid(constant.FORM_STEPS.DECLARATION_PAYMENT)
+                .required(),
+        });
+    }
+
+    submissionSchema() {
+        return Joi.object({
+
+            step: Joi.number()
+                .valid(constant.FORM_STEPS.SUBMISSION)
                 .required(),
         });
     }
@@ -707,7 +765,7 @@ class IpValidator {
             [FORM_STEPS.OTHER_DETAILS]: this.otherDetailsSchema(),
             [FORM_STEPS.DOCUMENTS]: this.documentsSchema(),
             [FORM_STEPS.DECLARATION_PAYMENT]: this.declarationPaymentSchema(),
-            // [FORM_STEPS.SUBMISSION]: this.submissionSchema(),
+            [FORM_STEPS.SUBMISSION]: this.submissionSchema(),
         };
         return schemas[step] || Joi.object();
     }

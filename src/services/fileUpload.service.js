@@ -1,4 +1,4 @@
-import documentReposotory from "../queries/document.reposotory.js";
+import documentRepository from "../queries/document.repository.js";
 import constant from "../constants/constant.js";
 import AppError from "../utills/AppError.js";
 import { fileURLToPath } from 'url';
@@ -14,7 +14,7 @@ class FileUploadService {
 
     async upload(payload) {
 
-        const { websiteType, id: contextId, files } = payload;
+        const { websiteType, contextId, files } = payload;
 
         const uploadedFiles = [];
 
@@ -35,11 +35,11 @@ class FileUploadService {
                 document_type: documentType,
             };
 
-            const documentDetails = await documentReposotory.checkExisting(criteria);
+            const documentDetails = await documentRepository.checkExisting(criteria);
             if (documentDetails) {
                 await this.removeLocally(documentDetails);
             }
-            
+
             const localResult = await this.saveToLocal(file.buffer, fileDetails.modifiedName, fileDetails.directory);
             // console.log(localResult);
             // return;
@@ -48,7 +48,7 @@ class FileUploadService {
                 modified_name: fileDetails.modifiedName,
                 doc_path: localResult.fullPath,
             };
-            const uploadResult = await documentReposotory.saveAndUpdate(criteria, fileData);
+            const uploadResult = await documentRepository.saveAndUpdate(criteria, fileData);
             uploadedFiles.push(uploadResult);
         }
         return uploadedFiles;
@@ -84,6 +84,7 @@ class FileUploadService {
     }
 
     async removeLocally(documentDetails) {
+
         const fileUrl = documentDetails.doc_path;
         const relativePath = fileUrl.replace(process.env.BASE_PATH, '');
         const oldFilePath = path.join(process.cwd(), 'public', relativePath);
@@ -125,78 +126,5 @@ class FileUploadService {
         };
     }
 }
-
-
-// class FileUploadService {
-//     async upload(payload) {
-//         const websiteType = payload.websiteType;
-//         const contextId = payload.id;
-
-//         const files = payload.files;
-
-//         // console.log('Files to upload:', files);
-
-//         const uploadedFiles = [];
-
-//         for (const file of files) {
-
-//             const originalName = file.originalname;
-//             const fileName = path.parse(originalName).name;
-//             const extension = path.extname(originalName);
-//             const modifiedName = `${fileName}_${Date.now()}${extension}`;
-//             const directory = path.join(
-//                 __dirname,
-//                 "..",
-//                 "public/documents",
-//                 payload.websiteType
-//             );
-
-//             console.log(originalName);
-//             return;
-//             try {
-//                 const uploadResult = await this.imageUpload({
-//                     file: file,
-//                     fieldname: file.fieldname,
-//                     originalname: file.originalname,
-//                     mimetype: file.mimetype,
-//                     buffer: file.buffer,
-//                     size: file.size,
-//                     contextId: contextId,
-//                     websiteType: websiteType
-//                 });
-//                 uploadedFiles.push(uploadResult);
-//             } catch (error) {
-//                 console.error(`Error uploading ${file.fieldname}:`, error);
-//                 throw error;
-//             }
-//         }
-
-//         return uploadedFiles;
-//     }
-
-//     async saveToLocal(buffer, filename) {
-//         const fs = require('fs').promises;
-//         const path = require('path');
-
-//         const uploadDir = path.join(__dirname, '../uploads');
-
-//         // Ensure upload directory exists
-//         try {
-//             await fs.access(uploadDir);
-//         } catch {
-//             await fs.mkdir(uploadDir, { recursive: true });
-//         }
-
-//         const uniqueFilename = `${Date.now()}_${filename}`;
-//         const filePath = path.join(uploadDir, uniqueFilename);
-
-//         await fs.writeFile(filePath, buffer);
-
-//         return {
-//             url: `/uploads/${uniqueFilename}`,
-//             path: filePath
-//         };
-//     }
-// }
 
 export default new FileUploadService();

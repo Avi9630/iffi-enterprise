@@ -49,7 +49,13 @@ const STEP_FIELD_MAP = Object.freeze({
         'right_holder_address'
     ]),
 
-    3: Object.freeze([]),
+    3: Object.freeze([
+        'director_name',
+        'director_email',
+        'director_mobile',
+        'director_address',
+        'director_indian_natinality',
+    ]),
 
     4: Object.freeze([
         'story_write_aurthor',
@@ -91,16 +97,9 @@ const STEP_FIELD_MAP = Object.freeze({
         'requisite_documents'
     ]),
 
-    8: Object.freeze([
-        'film_comletion_during_12month',
-        'film_screened',
-        'film_broadcast_tv',
-        'film_screened_inside_india',
-        'film_screened_outside_india',
-        'film_participated_compentitaion',
-        'is_directore_debute_film',
-        'film_distribution_limited_to_india_only',
-    ]),
+    8: Object.freeze([]),
+    
+    9: Object.freeze([]),
 });
 
 export default STEP_FIELD_MAP;

@@ -16,31 +16,7 @@ class IpRepository {
         }
     }
 
-    // async updateByFormId(id, data) {
-    //     try {
-    //         return await prisma.ip_application_forms.upsert({
-    //             where: {
-    //                 id_step: {
-    //                     id,
-    //                     step
-    //                 }
-    //             },
-    //             update: data,
-    //             create: {
-    //                 id,
-    //                 step,
-    //                 ...data
-    //             }
-    //         });
-    //     } catch (error) {
-    //         if (error.code === 'P2025') {
-    //             throw new AppError('Form not found.', 404);
-    //         }
-    //         throw error;
-    //     }
-    // }
-
-    async updateByFormId(id, data) {
+    async updateById(id, data) {
 
         const form = await prisma.ip_application_forms.findFirst({
             where: {
@@ -77,22 +53,62 @@ class IpRepository {
         });
     }
 
-    async findFormSteps(form_id) {
-        return await prisma.ip_application_forms.findMany({
-            where: { form_id },
-            orderBy: { step: 'asc' }
+    async findById(id, clientId) {
+
+        const entry = await prisma.ip_application_forms.findFirst({
+            where: { id, client_id: clientId }
         });
+
+        if (!entry) return null;
+
+        const documents = await prisma.documents.findMany({
+            where: {
+                context_id: entry.id,
+                document_type: { in: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] }
+            }
+        });
+
+        return {
+            ...entry,
+            documents
+        };
     }
 
-    async delete(form_id) {
+    async delete(id) {
         try {
-            return await prisma.ip_application_forms.deleteMany({
-                where: { form_id }
-            });
+            return await prisma.ip_application_forms.delete({ where: { id } });
         } catch (error) {
+            if (error.code === 'P2025') {
+                throw new AppError('IP application form not found.', 404);
+            }
+            if (error.code === 'P2003') {
+                throw new AppError('Cannot delete form, related records exist.', 409);
+            }
             throw new AppError('Failed to delete form.', 500);
         }
     }
+
+    // async findByIdWithDoc(id, clientId) {
+
+    //     const ipForm = await prisma.ip_application_forms.findFirst({
+    //         where: { id, client_id: clientId }
+    //     });
+
+    //     if (!ipForm) return null;
+
+    //     const documents = await prisma.documents.findMany({
+    //         where: {
+    //             context_id: ipForm.id,
+    //             document_type: { in: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] }
+    //         }
+    //     });
+
+    //     return {
+    //         ...ipForm,
+    //         documents
+    //     };
+    // }
+
 }
 
 export default new IpRepository();

@@ -45,7 +45,8 @@ class ValidateStepMiddleware {
                 });
             }
 
-            const schema = ipValidator.getSchemaForStep(Number(step));            
+            const schema = ipValidator.getSchemaForStep(Number(step));
+            
             // if (!schema) {
             //     throw new AppError("Validation error", 400, {
             //         step: `No validation schema defined for step ${step}`

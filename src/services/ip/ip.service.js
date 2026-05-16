@@ -1,3 +1,4 @@
+import documentRepository from '../../queries/document.repository.js';
 import STEP_FIELD_MAP from '../../constants/formStepFields.js';
 import ipRepository from "../../queries/ip/ip.repository.js";
 import fileUploadService from '../fileUpload.service.js';
@@ -5,6 +6,20 @@ import AppError from "../../utills/AppError.js";
 
 class IpService {
 
+    async checkExists(id, clientId) {
+
+        const entry = await ipRepository.findById(id, clientId);
+
+        if (!entry) {
+            throw new AppError('Entry not found.!', 404);
+        }
+
+        if (entry.client_id.toString() !== clientId.toString()) {
+            throw new AppError("Unauthorized: You can see other's entry.!", 403);
+        }
+
+        return entry;
+    }
     async store(payload) {
 
         const dataToStore = {
@@ -27,13 +42,12 @@ class IpService {
 
     async update(payload) {
 
-        const existingForm = await ipRepository.findByFormId(payload);
+        // const existingForm = await ipRepository.findById(payload.id, payload.client.id);
 
-        if (!existingForm) {
-            throw new AppError("Entry not found!", 404);
-        }
+        const existingForm = await this.checkExists(payload.id, payload.client.id);
 
         const currentStep = parseInt(payload.step, 10);
+
         const currentStepFields = STEP_FIELD_MAP[payload.step] || [];
 
         let dataToUpdate = {
@@ -64,7 +78,7 @@ class IpService {
 
         // Sanitize all data types before sending to Prisma
         const sanitizedData = await this.sanitizePayload(dataToUpdate);
-        const dbData = await ipRepository.updateByFormId(payload.id, sanitizedData);
+        const dbData = await ipRepository.updateById(payload.id, sanitizedData);
 
         if (!dbData) {
             throw new AppError('Something went wrong during update.!', 409);
@@ -73,7 +87,11 @@ class IpService {
         if (payload.files && Object.keys(payload.files).length > 0) {
             // console.log('For Files');
             // return;
-            const fileupload = await fileUploadService.upload(payload);
+            const fileData = {
+                ...payload,
+                contextId: payload.id
+            }
+            const fileupload = await fileUploadService.upload(fileData);
             if (!fileupload) {
                 throw new AppError('Something went wrong during upload document.!', 409);
             }
@@ -81,63 +99,37 @@ class IpService {
         return dbData;
     }
 
-    // async update(payload) {
-
-    //     const existingForm = await ipRepository.findByFormId(payload);
-
-    //     if (!existingForm) {
-    //         throw new AppError("Entry not found.!!", 404);
-    //     }
-
-    //     const dataToUpdate = {
-    //         client_id: payload.client.id,
-    //         step: payload.step,
-    //         // category: payload.category,
-    //         // year: new Date().getFullYear()
-    //     };
-
-    //     const currentStepFields = this.getStepFieldMap()[payload.step] || [];
-    //     currentStepFields.forEach(field => {
-    //         dataToUpdate[field] = null;
-    //     });
-
-    //     currentStepFields.forEach(field => {
-    //         if (payload[field] !== undefined) {
-    //             dataToUpdate[field] = payload[field];
-    //         }
-    //     });
-
-    //     const otherStepsFields = Object.values(this.getStepFieldMap())
-    //         .flat()
-    //         .filter(field => !currentStepFields.includes(field));
-
-    //     otherStepsFields.forEach(field => {
-    //         if (existingForm[field] !== undefined) {
-    //             dataToUpdate[field] = existingForm[field];
-    //         }
-    //     });
-
-    //     console.log(dataToUpdate);
-    //     return;
-
-    //     return await ipRepository.updateByFormId(
-    //         payload.id,
-    //         dataToUpdate
-    //     );
-    // }
-
     async getClientForms(client_id) {
         return await ipRepository.findByClientId(client_id);
     }
 
-    async getFormById(form_id) {
-        const form = await ipRepository.findByFormId(form_id);
+    async getFormById(id, clientId) {
 
-        if (!form) {
-            throw new AppError('Form not found', 404);
+        const entry = await this.checkExists(id, clientId);
+        return entry;
+    }
+
+    async deleteFormById(id, clientId) {
+
+        const entry = await this.checkExists(id, clientId);
+        const deleted = await ipRepository.delete(id);
+             
+
+        // Delete all local files if documents exist
+        if (deleted) {
+
+            const { documents } = entry;
+
+            if (documents.length) {
+                await Promise.all(
+                    documents.map(docuemt => fileUploadService.removeLocally(docuemt))
+                );
+                // Delete all document records from DB
+                await documentRepository.deleteMany(
+                    documents.map(doc => Number(doc.id))
+                );
+            }
         }
-
-        return form;
     }
 
     async sanitizePayload(data) {

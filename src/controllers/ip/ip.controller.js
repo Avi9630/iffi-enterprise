@@ -34,9 +34,6 @@ class IpController {
                 websiteType: constant.WEBSITE_TYPE.IP,
             };
 
-            // console.log(payload);
-            // return;
-            
             const result = await ipService.update(payload);
 
             return ApiResponse(res, 200, {
@@ -48,9 +45,38 @@ class IpController {
         }
     }
 
-    /**
-     * Get all forms for a client
-     */
+    async getForm(req, res, next) {
+        try {
+
+            const { id } = req.params;
+            const clientId = req.client.id;
+
+            const form = await ipService.getFormById(id, clientId);
+
+            return ApiResponse(res, 200, {
+                message: "Form retrieved successfully!",
+                data: form
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async deleteForm(req, res, next) {
+        try {
+            const { id } = req.params;
+            const clientId = req.client.id;
+
+            await ipService.deleteFormById(id, clientId);
+
+            return ApiResponse(res, 200, {
+                message: "Form deleted successfully!",
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
     async getClientForms(req, res, next) {
         try {
             const client_id = req.client.id;
@@ -65,22 +91,6 @@ class IpController {
         }
     }
 
-    /**
-     * Get single form by form_id
-     */
-    async getForm(req, res, next) {
-        try {
-            const { form_id } = req.params;
-            const form = await ipService.getFormById(form_id);
-
-            return ApiResponse(res, 200, {
-                message: "Form retrieved successfully!",
-                data: form
-            });
-        } catch (error) {
-            next(error);
-        }
-    }
 }
 
 export default new IpController();
