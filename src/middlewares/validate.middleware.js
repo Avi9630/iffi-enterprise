@@ -1,29 +1,5 @@
 import AppError from '../utills/AppError.js';
 
-// const validateRequest = (schema, property = 'body') => {
-//     return (req, res, next) => {
-//         const { error, value } = schema.validate(req[property], {
-//             abortEarly: false,
-//             stripUnknown: true,
-//         });
-
-//         if (error) {
-//             const errors = error.details.map(detail => ({
-//                 field: detail.path.join('.'),
-//                 message: detail.message,
-//             }));
-
-//             return next(new AppError('Validation failed', 400, errors));
-//         }
-
-//         req[property] = value;
-//         next();
-//     };
-// };
-
-// export default validateRequest;
-
-
 export default (schema, property = "body") => {
 
     return (req, res, next) => {
