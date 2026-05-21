@@ -1,8 +1,10 @@
 import winston from 'winston';
-import env from './env.js';
+import { config } from './config.js';
 
-// Define log format
-const logFormat = winston.format.combine(
+const isDev = ['development', 'production', 'local'].includes(config.env);
+
+
+const jsonFormat = winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.errors({ stack: true }),
     winston.format.splat(),
@@ -13,21 +15,28 @@ const consoleFormat = winston.format.combine(
     winston.format.colorize(),
     winston.format.timestamp({ format: 'HH:mm:ss' }),
     winston.format.printf(({ timestamp, level, message, ...meta }) => {
+
         let msg = `${timestamp} [${level}]: ${message}`;
+
         if (Object.keys(meta).length > 0) {
-            msg += ` ${JSON.stringify(meta)}`;
+            msg += ` ${JSON.stringify(meta, null, 2)}`;
         }
+
         return msg;
     })
 );
 
 const logger = winston.createLogger({
-    level: env.NODE_ENV === 'development' ? 'debug' : 'info',
-    format: logFormat,
-    // defaultMeta: { service: 'api-service' },    
+
+    level: isDev ? 'debug' : 'info',
+    // level: config.env === 'development' ? 'debug' : 'info',
+    format: jsonFormat,
+
     transports: [
+
         new winston.transports.Console({
-            format: env.NODE_ENV === 'development' ? consoleFormat : logFormat,
+            format: isDev ? consoleFormat : jsonFormat,
+            // format: config.env === 'development' ? consoleFormat : logFormat,
         }),
 
         new winston.transports.File({
@@ -35,12 +44,15 @@ const logger = winston.createLogger({
             level: 'error',
             maxsize: 5242880, // 5MB
             maxFiles: 5,
+            format: jsonFormat,
         }),
-        
+
+        // Combined Logs
         new winston.transports.File({
             filename: 'logs/combined.log',
             maxsize: 5242880, // 5MB
             maxFiles: 5,
+            format: jsonFormat,
         }),
     ],
 });
