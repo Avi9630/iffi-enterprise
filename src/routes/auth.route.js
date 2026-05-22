@@ -1,5 +1,5 @@
-import validateRequest from '../middlewares/validateRequest.js'
 import authController from '../controllers/auth.controller.js'
+import { validateRequest } from '../middlewares/index.js'
 import authValidator from '../validations/auth.validator.js'
 import express from 'express'
 

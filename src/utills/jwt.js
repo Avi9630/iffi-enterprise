@@ -1,12 +1,18 @@
 import jwt from "jsonwebtoken";
+import { config } from "../configs/index.js";
 
 export const generateToken = async (email, type = null) => {
 
     const expiresInMap = {
-        activate_token: process.env.ACTIVATE_TOKEN_EXPIRES_IN,
-        token: process.env.TOKEN_EXPIRES_IN,
-        default: process.env.JWT_EXPIRES_IN
+        activate_token: config.jwt.activateTokenExpiresIn,
+        token: config.jwt.tokenExpiresIn,
+        default: config.jwt.jwtExpiresIn
     };
+    // const expiresInMap = {
+    //     activate_token: process.env.ACTIVATE_TOKEN_EXPIRES_IN,
+    //     token: process.env.TOKEN_EXPIRES_IN,
+    //     default: process.env.JWT_EXPIRES_IN
+    // };
 
     const expiresIn = expiresInMap[type] || expiresInMap.default;
 
@@ -14,7 +20,7 @@ export const generateToken = async (email, type = null) => {
         {
             email
         },
-        process.env.JWT_SECRET,
+        config.jwt.secret,
         {
             expiresIn
         }
@@ -25,7 +31,7 @@ export const verifyToken = async (token) => {
 
     try {
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, config.jwt.secret);
 
         return {
             valid: true,

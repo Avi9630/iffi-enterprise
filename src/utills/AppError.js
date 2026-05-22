@@ -1,17 +1,8 @@
-// export class AppError extends Error {
-//     constructor(message, statusCode) {
-//         super(message);
-//         this.statusCode = statusCode;
-//         this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
-//         this.isOperational = true;
-//         Error.captureStackTrace(this, this.constructor);
-//     }
-// }
-
 import { ERROR_CODES } from "./constant.js";
 
-export class AppError extends Error {
-    constructor(statusCode, message, errorCode) {
+class AppError extends Error {
+
+    constructor(message, statusCode, errorCode) {
         super(message);
         this.statusCode = statusCode;
         this.errorCode = errorCode ?? AppError._deriveCode(statusCode);
@@ -30,3 +21,6 @@ export class AppError extends Error {
         return map[statusCode] ?? ERROR_CODES.INTERNAL_ERROR;
     }
 }
+
+export default AppError;
+// export default new AppError();

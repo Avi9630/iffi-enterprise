@@ -7,9 +7,9 @@ import morgan from "morgan";
 import cors from "cors";
 import path from 'path';
 import { config } from '../src/configs/index.js';
-import { errorMiddleware } from '../src/middlewares/index.js'
-import { AppError } from '../src/utills/index.js'
-// import apiRoutes from './routes/index.js';
+import { authLimiter, errorMiddleware, globalLimiter } from '../src/middlewares/index.js'
+import AppError from './utills/AppError.js';
+import apiRoutes from './routes/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -20,7 +20,7 @@ app.use(helmet());
 
 // Cors
 app.use(cors());
-app.options('*', cors());
+// app.options('/*', cors());
 
 // HTTP logger
 if (config.env !== 'test') {
@@ -41,22 +41,15 @@ if (config.env === 'production') {
 }
 
 // Passport
-app.use(passport.initialize());
-passport.use('jwt', jwtStrategy);
+// app.use(passport.initialize());
+// passport.use('jwt', jwtStrategy);
 
 // ── Static — uploaded images (swap this base path for CDN later) ──────────────
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 const __dirname = path.dirname(__filename);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
-app.use('/health', healthRouter);
-app.use('/api/v1', v1Router);
-
-// 404 Error
-app.use((_req, _res, next) => {
-    next(new AppError(404, 'Route not found'));
-});
+app.use('/api', apiRoutes);
 
 // Testing
 app.get('/', (req, resp) => {
@@ -66,23 +59,11 @@ app.get('/', (req, resp) => {
     });
 });
 
-// authRoutes
-// app.use('/api', apiRoutes);
-
 // ✅ 404 Handler (must be after all routes)
-// app.use((req, res) => {
-//     res.status(404).json({
-//         success: false,
-//         message: 'API route not found'
-//     });
-// });
-
-// app.all('*', (req, res) => {
-//     res.status(404).json({
-//         success: false,
-//         message: `Cannot find ${req.originalUrl} on this server`
-//     });
-// });
+app.use((req, res, next) => {
+    next(new AppError('Route not found', 404));
+    // next(AppError('Route not found', 404));
+});
 
 // errorMiddleware
 app.use(errorMiddleware);

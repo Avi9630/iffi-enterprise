@@ -1,24 +1,9 @@
 import ipValidator from "../validations/ip.validator.js";
-import validateRequest from "./validateRequest.js";
+import validateRequest from "./validate.middleware.js";
 import constant from '../constants/constant.js';
 import AppError from "../utills/AppError.js";
 
 class ValidateStepMiddleware {
-
-    // validateByStep(req, res, next) {
-    //     const step = parseInt(req.body.step);
-    //     if (!step) {
-    //         return res.status(400).json({
-    //             status: false,
-    //             message: "Validation error",
-    //             errors: {
-    //                 step: "step is required"
-    //             }
-    //         });
-    //     }
-    //     const schema = ipValidator.getSchemaForStep(step);
-    //     return validateRequest(schema)(req, res, next);
-    // }
 
     validateByStep(req, res, next) {
         try {
@@ -66,6 +51,5 @@ class ValidateStepMiddleware {
             next(error);
         }
     };
-
 }
 export default new ValidateStepMiddleware();

@@ -6,6 +6,7 @@ export default (schema, property = "body") => {
 
         const { error } = schema.validate(req[property], {
             abortEarly: false,
+            stripUnknown: true,
             // allowUnknown: true
         });
 
