@@ -1,3 +1,6 @@
+import { authLimiter, errorMiddleware, globalLimiter } from '../src/middlewares/index.js'
+import { config } from '../src/configs/index.js';
+import AppError from './utills/AppError.js';
 import compression from 'compression';
 import { fileURLToPath } from 'url';
 import passport from 'passport';
@@ -6,10 +9,6 @@ import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
 import path from 'path';
-import { config } from '../src/configs/index.js';
-import { authLimiter, errorMiddleware, globalLimiter } from '../src/middlewares/index.js'
-import AppError from './utills/AppError.js';
-import apiRoutes from './routes/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -49,7 +48,9 @@ const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api', apiRoutes);
+// Routes
+import routes from './routes/index.js';
+app.use('/api', routes);
 
 // Testing
 app.get('/', (req, resp) => {
@@ -62,7 +63,6 @@ app.get('/', (req, resp) => {
 // ✅ 404 Handler (must be after all routes)
 app.use((req, res, next) => {
     next(new AppError('Route not found', 404));
-    // next(AppError('Route not found', 404));
 });
 
 // errorMiddleware
