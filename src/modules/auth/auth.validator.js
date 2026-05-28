@@ -22,7 +22,7 @@ const registerSchema = Joi.object({
             "string.pattern.base": "Mobile must be exactly 10 digits"
         }),
 
-    type_id: Joi.number()
+    client_type_id: Joi.number()
         .integer()
         .positive()
         .required(),
@@ -63,6 +63,34 @@ const resetPasswordSchema = Joi.object({
         .required(),
 });
 
+const sendOtpSchema = Joi.object({
+    type: Joi.string().valid('EMAIL', 'MOBILE').required(),
+    target: Joi.when('type', {
+        is: 'EMAIL',
+        then: Joi.string().trim().email({ tlds: false }).required(),
+        otherwise: Joi.string()
+            .pattern(/^[6-9]\d{9}$/)
+            .required()
+            .messages({ 'string.pattern.base': 'Please enter a valid mobile number' })
+    })
+});
+
+// const verifyOtpSchema = Joi.object({
+//     type: Joi.string().valid('EMAIL', 'MOBILE').required(),
+//     target: Joi.when('type', {
+//         is: 'EMAIL',
+//         then: Joi.string().trim().email({ tlds: false }).required(),
+//         otherwise: Joi.string()
+//             .pattern(/^[6-9]\d{9}$/)
+//             .required()
+//             .messages({ 'string.pattern.base': 'Please enter a valid mobile number' })
+//     }),
+//     otp: Joi.number()
+//         .integer()
+//         .positive()
+//         .required(),
+// });
+
 const changePasswordSchema = Joi.object({
     email: Joi.string()
         .email()
@@ -92,12 +120,4 @@ const verifyOtpSchema = Joi.object({
         .required(),
 });
 
-export default
-    {
-        registerSchema,
-        verifyEmailSchema,
-        loginSchema,
-        resetPasswordSchema,
-        changePasswordSchema,
-        verifyOtpSchema
-    };
+export default { registerSchema, verifyEmailSchema, loginSchema, resetPasswordSchema, changePasswordSchema, verifyOtpSchema, sendOtpSchema };

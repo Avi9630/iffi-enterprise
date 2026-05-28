@@ -1,4 +1,3 @@
-// middleware/auth.middleware.js
 import jwt from 'jsonwebtoken';
 import prisma from '../configs/prisma.js';
 
@@ -81,6 +80,7 @@ import prisma from '../configs/prisma.js';
 // };
 
 class AuthMiddleware {
+    
     async verifyToken(req, res, next) {
         try {
 
@@ -161,8 +161,7 @@ class AuthMiddleware {
 
             next();
         } catch (error) {
-            // Continue without authentication
-            next();
+            next(error);
         }
     }
 }

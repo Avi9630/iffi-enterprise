@@ -13,6 +13,18 @@ class CommonHelper {
             req.ip
         );
     }
+
+    async serializeBigInt(obj) {
+        return JSON.parse(
+            JSON.stringify(
+                obj,
+                (_, value) =>
+                    typeof value === 'bigint'
+                        ? value.toString()
+                        : value
+            )
+        );
+    };
 }
 
 export default new CommonHelper();

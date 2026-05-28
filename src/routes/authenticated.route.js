@@ -1,4 +1,4 @@
-import authController from '../controllers/auth.controller.js';
+import authController from '../modules/auth/auth.controller.js';
 import authMiddleware from '../middlewares/auth.middleware.js'
 import ipRoutes from './ip.route.js'
 import express from 'express'

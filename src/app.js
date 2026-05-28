@@ -33,12 +33,6 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // Compression
 app.use(compression());
 
-// Rate Limiting
-app.use(globalLimiter);
-if (config.env === 'production') {
-    app.use('/api/v1/auth', authLimiter);
-}
-
 // Passport
 // app.use(passport.initialize());
 // passport.use('jwt', jwtStrategy);
@@ -48,17 +42,18 @@ const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // app.use(express.static(path.join(__dirname, 'public')));
 
-// Routes
-import routes from './routes/index.js';
-app.use('/api', routes);
+// Rate Limiting----------------------------------------------------
+app.use(globalLimiter);
+if (config.env === 'development' || config.env === 'production') {
+    app.use('/api/v2/auth', authLimiter);
+}
 
-// Testing
-app.get('/', (req, resp) => {
-    resp.json({
-        status: true,
-        message: 'IFFI Enterprise API Running'
-    });
-});
+// Routes
+import testingRoutes from './routes/testing.route.js';
+import routes from './routes/index.js';
+
+app.use('/', testingRoutes);
+app.use('/api/v2', routes);
 
 // ✅ 404 Handler (must be after all routes)
 app.use((req, res, next) => {

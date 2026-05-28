@@ -18,11 +18,16 @@ const envSchema = Joi.object({
     // /----DATABASE URL ---------------------------------------------------------
     DATABASE_URL: Joi.string().required(),
 
+    // ── Redis ──────────────────────────────────────────────────────────────────
+    REDIS_HOST: Joi.string().default('localhost'),
+    REDIS_PORT: Joi.number().default(6379),
+    REDIS_PASSWORD: Joi.string().allow('').optional(),
+
     // /----JWT-------------------------------------------------------------------
     JWT_SECRET: Joi.string().required(),
-    JWT_EXPIRES_IN: Joi.string().default('7d'),
-    TOKEN_EXPIRES_IN: Joi.string().required(),
-    ACTIVATE_TOKEN_EXPIRES_IN: Joi.string().default('10m'),
+    JWT_ACCESS_TOKEN_EXPIRES_IN: Joi.string().default('1m'),
+    JWT_REFERESH_TOKEN_EXPIRES_IN: Joi.string().required('10d'),
+    JWT_ACTIVATION_TOKEN_EXPIRES_IN: Joi.string().default('10m'),
     BCRYPT_ROUNDS: Joi.number().default(10),
     BCRYPT_SALT_ROUNDS: Joi.number().default(12),
 
@@ -66,12 +71,19 @@ export const config = {
     recaptchaSecretKey: env.RECAPTCHA_SECRET_KEY,
     databaseUrl: env.DATABASE_URL,
     basePath: env.BASE_PATH,
+    frontendUrl: env.FRONTEND_URL,
+
+    redis: {
+        host: env.REDIS_HOST,
+        port: env.REDIS_PORT,
+        password: env.REDIS_PASSWORD || undefined,
+    },
 
     jwt: {
         secret: env.JWT_SECRET,
-        jwtExpiresIn: env.JWT_EXPIRES_IN,
-        tokenExpiresIn: env.TOKEN_EXPIRES_IN,
-        activateTokenExpiresIn: env.ACTIVATE_TOKEN_EXPIRES_IN,
+        jwtAccessTokenExpiresIn: env.JWT_ACCESS_TOKEN_EXPIRES_IN,
+        jwtRefereshTokenExpiresIn: env.JWT_REFERESH_TOKEN_EXPIRES_IN,
+        jwtActivationTokenExpiresIn: env.JWT_ACTIVATION_TOKEN_EXPIRES_IN,
         bryptRounds: env.BCRYPT_ROUNDS,
         bryptSaltRounds: env.BCRYPT_SALT_ROUNDS
     },
@@ -81,8 +93,8 @@ export const config = {
             host: env.SMTP_HOST,
             port: env.SMTP_PORT,
             auth: {
-                user: env.SMTP_USERNAME,
-                pass: env.SMTP_PASSWORD,
+                username: env.SMTP_USERNAME,
+                password: env.SMTP_PASSWORD,
             },
         },
         from: env.EMAIL_FROM,

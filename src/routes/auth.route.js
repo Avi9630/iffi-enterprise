@@ -1,6 +1,6 @@
-import authController from '../controllers/auth.controller.js'
+import authController from '../modules/auth/auth.controller.js'
 import { validateRequest } from '../middlewares/index.js'
-import authValidator from '../validations/auth.validator.js'
+import authValidator from '../modules/auth/auth.validator.js'
 import express from 'express'
 
 const router = express.Router();

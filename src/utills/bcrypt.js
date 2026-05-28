@@ -59,3 +59,13 @@ export const hashPasswordSync = (password) => {
         throw new Error('Error hashing password: ' + error.message);
     }
 };
+
+export const hashOtp = async (otp) => {
+    try {
+        const salt = await bcrypt.genSalt(SALT_ROUNDS);
+        const hashedOtp = await bcrypt.hash(otp, salt);
+        return hashedOtp;
+    } catch (error) {
+        throw new Error('Error hashing password: ' + error.message);
+    }
+};

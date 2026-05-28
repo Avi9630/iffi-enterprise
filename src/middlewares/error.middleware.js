@@ -4,7 +4,7 @@ export const errorMiddleware = (err, req, res, _next) => {
 
     const statusCode = err.statusCode ?? 500;
     const message = err.isOperational ? err.message : 'Internal server error';
-    const code = err.errorCode ?? 'internal_server_error';
+    // const code = err.errorCode ?? 'internal_server_error';
 
     // console.log('From error middleware ----- Start');
     // console.log(statusCode);
@@ -18,10 +18,10 @@ export const errorMiddleware = (err, req, res, _next) => {
     }
 
     res.status(statusCode).json({
-        success: false,
-        status: statusCode,
+        status: false,
+        // status: statusCode,
         message,
-        code,
+        // code,
     });
 };
 
