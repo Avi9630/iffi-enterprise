@@ -3,7 +3,6 @@ import { config } from '../src/configs/index.js';
 import AppError from './utills/AppError.js';
 import compression from 'compression';
 import { fileURLToPath } from 'url';
-import passport from 'passport';
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -14,12 +13,11 @@ const __filename = fileURLToPath(import.meta.url);
 
 const app = express();
 
-// Security header
-app.use(helmet());
+app.use(helmet()); //// SECURITY HEADER
 
-// Cors
-app.use(cors());
-// app.options('/*', cors());
+app.use(cors()); ////CORS
+
+//app.options('/*', cors());
 
 // HTTP logger
 if (config.env !== 'test') {
@@ -32,10 +30,6 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Compression
 app.use(compression());
-
-// Passport
-// app.use(passport.initialize());
-// passport.use('jwt', jwtStrategy);
 
 // ── Static — uploaded images (swap this base path for CDN later) ──────────────
 const __dirname = path.dirname(__filename);

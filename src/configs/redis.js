@@ -8,7 +8,7 @@ class RedisClient {
         this.client = null;
     }
 
-    connect() {
+    async connect() {
 
         if (this.client) {
             return this.client;
@@ -34,19 +34,19 @@ class RedisClient {
         return this.client;
     }
 
-    getClient() {
-        if (!this.client) {
-            return this.connect();
-        }
-        return this.client;
-    }
-
     async disconnect() {
         if (this.client) {
             await this.client.quit();
             this.client = null;
             logger.info('Redis disconnected');
         }
+    }
+
+    getClient() {
+        if (!this.client) {
+            return this.connect();
+        }
+        return this.client;
     }
 }
 

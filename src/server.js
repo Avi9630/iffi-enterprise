@@ -5,22 +5,16 @@ const PORT = config.port;
 
 const start = async () => {
 
-    // DATABASE CONNECTION;
-    await database.connect();
+    await database.connect();   // DATABASE CONNECTION;
+    await redisClient.connect();    // RedisConnect();
 
-    // RedisConnect();
-    await redisClient.connect();
-    
     // START HTTP SERVER
-
     const server = app.listen(PORT, () => {
         logger.info(`Server running in ${config.env} mode on port ${PORT}`);
     });
 
     // SHUTDOWN DATABASE CONNECTIONS ON EXIT;
-
     const shutdown = async (signal) => {
-
         logger.info(`${signal} received — shutting down gracefully`);
         server.close(async () => {
             await database.disconnect();

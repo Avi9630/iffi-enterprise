@@ -1,9 +1,5 @@
-import clientRepository from '../../queries/client.repository.js';
-import twoAuthService from '../../services/twoAuth.service.js';
-import clientService from '../../services/client.service.js';
 import { ApiResponse, AppError, maskTarget } from '../../utills/index.js';
 import { sendMail } from '../../mail/mailer.js';
-import prisma from '../../configs/prisma.js';
 import authService from './auth.service.js';
 
 class AuthController {
@@ -80,14 +76,15 @@ class AuthController {
 
     async resetPassword(req, res, next) {
         try {
-            const { type, target } = req.body;
+            const { email } = req.body;
             const ip = req.ip;
 
-            await authService.resetPassword(type, target, ip);
+            await authService.resetPassword(email, ip);
 
             return ApiResponse(res, 200, {
-                message: "An OTP has been send to your registered email address.!!",
+                message: "An OTP has been send to your registered email address.!",
             });
+
         } catch (error) {
             return next(error);
         }
@@ -126,7 +123,7 @@ class AuthController {
 
         try {
 
-            await authService.logout(req.client);
+            await authService.logout(req.clientDetails);
             return ApiResponse(res, 200, {
                 message: "Logout successfully.!!",
             });

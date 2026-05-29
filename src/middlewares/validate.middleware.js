@@ -1,4 +1,3 @@
-import AppError from '../utills/AppError.js';
 
 export default (schema, property = "body") => {
 
@@ -6,8 +5,8 @@ export default (schema, property = "body") => {
 
         const { error } = schema.validate(req[property], {
             abortEarly: false,
-            stripUnknown: true,
-            // allowUnknown: true
+            // stripUnknown: true,
+            allowUnknown: true
         });
 
         if (error) {
@@ -25,14 +24,6 @@ export default (schema, property = "body") => {
                 errors: formattedErrors
             });
         }
-
-        // if (error) {
-        //     return res.status(400).json({
-        //         success: false,
-        //         errors: error.details.map(err => err.message)
-        //     });
-        // }
-
         next();
     };
 };

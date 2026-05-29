@@ -64,32 +64,19 @@ const resetPasswordSchema = Joi.object({
 });
 
 const sendOtpSchema = Joi.object({
-    type: Joi.string().valid('EMAIL', 'MOBILE').required(),
-    target: Joi.when('type', {
-        is: 'EMAIL',
-        then: Joi.string().trim().email({ tlds: false }).required(),
-        otherwise: Joi.string()
-            .pattern(/^[6-9]\d{9}$/)
-            .required()
-            .messages({ 'string.pattern.base': 'Please enter a valid mobile number' })
-    })
+    email: Joi.string()
+        .email()
+        .required(),
+    // type: Joi.string().valid('EMAIL', 'MOBILE').required(),
+    // target: Joi.when('type', {
+    //     is: 'EMAIL',
+    //     then: Joi.string().trim().email({ tlds: false }).required(),
+    //     otherwise: Joi.string()
+    //         .pattern(/^[6-9]\d{9}$/)
+    //         .required()
+    //         .messages({ 'string.pattern.base': 'Please enter a valid mobile number' })
+    // })
 });
-
-// const verifyOtpSchema = Joi.object({
-//     type: Joi.string().valid('EMAIL', 'MOBILE').required(),
-//     target: Joi.when('type', {
-//         is: 'EMAIL',
-//         then: Joi.string().trim().email({ tlds: false }).required(),
-//         otherwise: Joi.string()
-//             .pattern(/^[6-9]\d{9}$/)
-//             .required()
-//             .messages({ 'string.pattern.base': 'Please enter a valid mobile number' })
-//     }),
-//     otp: Joi.number()
-//         .integer()
-//         .positive()
-//         .required(),
-// });
 
 const changePasswordSchema = Joi.object({
     email: Joi.string()

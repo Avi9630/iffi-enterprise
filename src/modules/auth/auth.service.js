@@ -1,5 +1,13 @@
 import authRepo from './auth.repository.js';
-import { AppError, comparePassword, generateAccessToken, generateActivationToken, generateRefereshToken, hashPassword, verifyToken, } from '../../utills/index.js';
+import {
+    AppError,
+    comparePassword,
+    generateAccessToken,
+    generateActivationToken,
+    generateRefereshToken,
+    hashPassword,
+    verifyToken
+} from '../../utills/index.js';
 import { config } from '../../configs/config.js';
 import { sendMail } from '../../mail/mailer.js';
 import { token } from 'morgan';
@@ -31,7 +39,7 @@ class AuthService {
         const client = await this.createClient(payload);
 
         if (!client) {
-            throw new AppError('Unable to register client.!');
+            throw new AppError('Unable to register client.!', 404);
         }
 
         // Send verification email //DON'T DELETE THIS CODE-------------------------------
@@ -63,7 +71,7 @@ class AuthService {
 
         const existsClientType = await authRepo.clientTypeById(client_type_id);
         if (!existsClientType) {
-            throw new AppError('Invalid client type', 404);
+            throw new AppError('Invalid client type.', 404);
         }
 
         const clientData = {
@@ -137,7 +145,11 @@ class AuthService {
         const client = await authRepo.findClientByActivationToken(token);
 
         if (!client) {
-            throw new AppError("Account not found.!!", 404);
+            throw new AppError("Account not found.!", 404);
+        }
+
+        if (client.status == 'BLOCKED') {
+            throw new AppError("Account blocked by ADMIN. Please contact our support!!", 422);
         }
 
         const decryptToken = await verifyToken(token);
@@ -151,17 +163,17 @@ class AuthService {
         }
 
         // Send verification email
-        await sendMail({
-            to: client.email,
-            subject: "Welcome to the International Film Festival of India!",
-            templateName: "registration.ejs",
-            context: {
-                client_name: client.name,
-                client_email: client.email,
-                frontend_base_url: process.env.FRONTEND_URL,
-                activate_token: client.activate_token
-            }
-        });
+        // await sendMail({
+        //     to: client.email,
+        //     subject: "Welcome to the International Film Festival of India!",
+        //     templateName: "registration.ejs",
+        //     context: {
+        //         client_name: client.name,
+        //         client_email: client.email,
+        //         frontend_base_url: process.env.FRONTEND_URL,
+        //         activate_token: client.activate_token
+        //     }
+        // });
 
         return {
             client: {
@@ -179,6 +191,10 @@ class AuthService {
 
         if (!client) {
             throw new AppError('Email not registered with us. Please register.!', 404);
+        }
+
+        if (client.status == 'BLOCKED') {
+            throw new AppError("Account blocked by ADMIN. Please contact our support!!", 422);
         }
 
         const activationToken = await generateActivationToken(email);
@@ -201,20 +217,9 @@ class AuthService {
 
     }
 
-    async findExistingClient(type, target) {
+    async findExistingClient(email) {
 
-        const CLIENT_LOOKUP = {
-            EMAIL: (target) => authRepo.findByEmail(target),
-            MOBILE: (target) => authRepo.findByMobile(target),
-        };
-
-        const findClient = CLIENT_LOOKUP[type];
-
-        if (!findClient) {
-            throw new AppError(`Invalid type '${type}'. Must be EMAIL or MOBILE.`, 400);
-        }
-
-        const client = await findClient(target);
+        const client = await authRepo.findByEmail(email);
 
         if (!client) {
             throw new AppError('Account not found.! Please register an account.!', 404);
@@ -223,9 +228,9 @@ class AuthService {
         return client;
     }
 
-    async resetPassword(type, target, ip) {
+    async resetPassword(email, ip) {
 
-        const client = await this.findExistingClient(type, target);
+        const client = await this.findExistingClient(email);
 
         const existingOtp = await authRepo.getOtpCodesByClient(client.id);
 
@@ -252,7 +257,6 @@ class AuthService {
     }
 
     async sendOtp(type, target, client, ip) {
-
         const EXPIRES_AT = new Date(Date.now() + 10 * 60 * 1000);
         const OTP = Math.floor(100000 + Math.random() * 900000);
         const dataToAdd = {
@@ -268,10 +272,10 @@ class AuthService {
     }
 
     async resendOtp(existingOtp) {
-
-        const EXPIRES_AT = new Date(Date.now() + 10 * 60 * 1000);
         const COOLDOWN_MS = 60 * 1000;
+        const EXPIRES_AT = new Date(Date.now() + 10 * 60 * 1000);
         const age = Date.now() - new Date(existingOtp.created_at).getTime();
+
         if (age < COOLDOWN_MS) {
             const waitSec = Math.ceil((COOLDOWN_MS - age) / 1000);
             throw new AppError(
@@ -281,7 +285,6 @@ class AuthService {
         }
 
         const OTP = Math.floor(100000 + Math.random() * 900000);
-
         const record = await authRepo.updateOtpById(existingOtp.id,
             {
                 otp: OTP,
@@ -357,6 +360,7 @@ class AuthService {
         if (!client) {
             throw new AppError("Invalid email entered.!!", 404);
         }
+
         const hashedPassword = payload.password ? await hashPassword(payload.password) : null;
 
         return await authRepo.updateClientById(client.id, { password_hash: hashedPassword });

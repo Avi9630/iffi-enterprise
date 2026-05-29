@@ -1,17 +1,17 @@
-import clientRepository from "../queries/client.repository.js";
-import commonRepository from "../queries/common.repository.js";
-import ApiResponse from "../utills/ApiResponse.js";
-import AppError from "../utills/AppError.js";
+import { redisClient } from "../../configs/index.js";
+import { ApiResponse } from "../../utills/index.js";
+import commonRepository from "./common.repository.js";
 
 class CommonController {
 
     async masterData(req, res, next) {
         try {
-            const { type } = req.params;
 
+            const { type } = req.params;
+            
             const handlers = {
-                'client-list': () => clientRepository.clientList(),
-                'ip-type-list': () => commonRepository.ipTypeList(),
+                'client-list': () => commonRepository.clientList(),
+                'client-type-list': () => commonRepository.clientTypeList(),
                 'language-list': () => commonRepository.languageList(),
                 'genre': () => commonRepository.genreList(),
                 'country': () => commonRepository.countryList(),
@@ -26,6 +26,7 @@ class CommonController {
             };
 
             const handler = handlers[type];
+
             if (!handler) {
                 throw new AppError('Invalid master data type.!', 400);
             }

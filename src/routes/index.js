@@ -1,13 +1,13 @@
 import authenticatedRoutes from './authenticated.route.js'
 import { authRoutes } from '../modules/auth/index.js';
-import apiRoutes from './api.route.js';
+import commonRoutes from '../modules/common/common.routes.js'
 import express from 'express';
 
 const router = express.Router();
 
 router.use('/auth', authRoutes);
 
-router.use('/freepi', apiRoutes);
+router.use('/common-data', commonRoutes);
 
 router.use('/authenticated', authenticatedRoutes);
 

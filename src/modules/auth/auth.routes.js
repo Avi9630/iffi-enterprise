@@ -18,9 +18,4 @@ router
     .get('/activate-account/:token', authController.activateAccount)
     .post('/logout', authMiddleware.verifyToken, authController.logout)
 
-// router
-//     .route('/activate-account/:token')
-//     .get(authController.activateAccount)
-//     .post(authController.activateAccount);
-
 export default router;
