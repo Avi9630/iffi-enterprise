@@ -1,5 +1,5 @@
 import { redisClient } from "../../configs/index.js";
-import { ApiResponse } from "../../utills/index.js";
+import { ApiResponse, AppError } from "../../utills/index.js";
 import commonRepository from "./common.repository.js";
 
 class CommonController {
@@ -8,9 +8,9 @@ class CommonController {
         try {
 
             const { type } = req.params;
-            
+
             const handlers = {
-                'client-list': () => commonRepository.clientList(),
+                // 'client-list': () => commonRepository.clientList(),
                 'client-type-list': () => commonRepository.clientTypeList(),
                 'language-list': () => commonRepository.languageList(),
                 'genre': () => commonRepository.genreList(),
@@ -19,9 +19,9 @@ class CommonController {
                 'city': () => {
                     const { state_id } = req.query;
                     if (!state_id) {
-                        throw new AppError('state_id is required for city list.!', 400);
+                        return commonRepository.cityList(state_id);
                     }
-                    return commonRepository.cityList(state_id);
+                    return commonRepository.cityListWithState(state_id);
                 }
             };
 
