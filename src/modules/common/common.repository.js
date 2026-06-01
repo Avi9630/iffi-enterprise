@@ -84,60 +84,12 @@ class CommonRepository {
         });
     }
 
-    // async clientList() {
-    //     return this._getCached('clients', () =>
-    //         prisma.clients.findMany()
-    //     );
-    // }
-
-
     async languageList() {
         return this._getCached('languages', async () => {
             const model = await this.getModel('languages');
             return model.findMany();
         });
     }
-
-    // async genreList() {
-    //     return this._getCached('genres', () =>
-    //         prisma.genres.findMany()
-    //     );
-    // }
-
-    // async countryList() {
-    //     return this._getCached('countries', () =>
-    //         prisma.countries.findMany({
-    //             // select: {
-    //             //     id: true,
-    //             //     name: true,
-    //             //     code: true,
-    //             //     // Select only needed fields
-    //             // }
-    //         })
-    //     );
-    // }
-
-    // async stateList(countryId) {
-    //     return this._getCached('states', () =>
-    //         prisma.states.findMany({
-    //             orderBy: {
-    //                 name: 'asc'
-    //             }
-    //         })
-    //     );
-    // }
-
-    // async cityListWithState(stateId) {
-    //     return this._getCached(`cities_${stateId}`, () =>
-    //         prisma.cities.findMany({
-    //             where: { state_id: parseInt(stateId) },
-    //             orderBy: {
-    //                 city: 'asc'
-    //             }
-    //         })
-    //     );
-    // }
-
 
 }
 export default new CommonRepository();
