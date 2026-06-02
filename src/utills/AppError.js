@@ -1,4 +1,4 @@
-import { ERROR_CODES } from "./constant.js";
+import { ERROR_CODES } from '../constants/index.js'
 
 // class AppError extends Error {
 

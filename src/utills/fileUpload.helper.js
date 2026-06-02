@@ -10,12 +10,11 @@ dotenv.config()
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-class FileUploadService {
+class FileUploadHelper {
 
     async upload(payload) {
 
         const { websiteType, contextId, files } = payload;
-
         const uploadedFiles = [];
 
         for (const file of files) {
@@ -34,8 +33,13 @@ class FileUploadService {
                 website_type: websiteType,
                 document_type: documentType,
             };
-
+            
             const documentDetails = await documentRepository.checkExisting(criteria);
+            
+            console.log('bkfjsbkjfdbsdbaksjbdkjasbdjkasbjb kj');
+            console.log(documentDetails);
+            return 'Hello';
+
             if (documentDetails) {
                 await this.removeLocally(documentDetails);
             }
@@ -127,4 +131,4 @@ class FileUploadService {
     }
 }
 
-export default new FileUploadService();
+export default new FileUploadHelper();

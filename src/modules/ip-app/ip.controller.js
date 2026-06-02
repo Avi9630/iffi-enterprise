@@ -1,17 +1,16 @@
-import fileUploadService from "../../services/fileUpload.service.js";
-import ipService from "../../services/ip/ip.service.js";
-import ApiResponse from "../../utills/ApiResponse.js";
-import constant from "../../constants/constant.js";
+import ApiResponse from "../../utills/ApiResponse.js"
+import ipService from './ip.service.js'
 
 class IpController {
 
     async addForm(req, res, next) {
         try {
+
             const payload = {
                 ...req.body,
-                client: req.client
+                client: req.clientDetails
             };
-
+                        
             const result = await ipService.store(payload);
 
             return ApiResponse(res, 201, {
@@ -28,12 +27,13 @@ class IpController {
             const { id } = req.params;
             const payload = {
                 ...req.body,
-                client: req.client,
+                client: req.clientDetails,
                 id,
                 files: req.files,
-                websiteType: constant.WEBSITE_TYPE.IP,
+                // websiteType: constant.WEBSITE_TYPE.IP,
             };
-
+            console.log(payload);
+            return
             const result = await ipService.update(payload);
 
             return ApiResponse(res, 200, {

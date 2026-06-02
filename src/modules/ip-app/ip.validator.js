@@ -1,10 +1,11 @@
 import Joi from "joi";
-import { FORM_STEPS } from "../../utills/index.js";
+import { IP_FORM_STEPS } from "../../constants/index.js";
 
 class IpValidator {
 
     entryFormSchema() {
         return Joi.object({
+
             step: Joi.number()
                 .integer()
                 .positive()
@@ -169,7 +170,7 @@ class IpValidator {
         return Joi.object({
 
             step: Joi.number()
-                .valid(constant.FORM_STEPS.FILM_DETAILS)
+                .valid(IP_FORM_STEPS.FILM_DETAILS)
                 .required(),
 
             category: Joi.number()
@@ -330,7 +331,7 @@ class IpValidator {
         return Joi.object({
 
             step: Joi.number()
-                .valid(constant.FORM_STEPS.PRODUCERS_DETAILS)
+                .valid(IP_FORM_STEPS.PRODUCERS_DETAILS)
                 .required(),
 
             producer_is: Joi.number()
@@ -444,7 +445,7 @@ class IpValidator {
                 otherwise: Joi.optional()
             }),
 
-            producer_id_proof: Joi.any()
+            producer_id_proof: Joi.required()
         });
     }
 
@@ -452,7 +453,7 @@ class IpValidator {
         return Joi.object({
 
             step: Joi.number()
-                .valid(constant.FORM_STEPS.DIRECTORS_DETAILS)
+                .valid(IP_FORM_STEPS.DIRECTORS_DETAILS)
                 .required(),
 
             director_name: Joi.string()
@@ -489,7 +490,27 @@ class IpValidator {
                 .valid(1)
                 .required(),
 
-            director_id_proof: Joi.any()
+            // director_id_proof: Joi.object().required()
+
+            director_id_proof: Joi.object()
+                .required()
+                .custom((value, helpers) => {
+                    const allowedTypes = [
+                        'image/jpeg',
+                        'image/png',
+                        'application/pdf'
+                    ];
+
+                    if (!allowedTypes.includes(value.mimetype)) {
+                        return helpers.message('Only JPG, PNG and PDF files are allowed');
+                    }
+
+                    if (value.size > 5 * 1024 * 1024) {
+                        return helpers.message('File size must be less than 5 MB');
+                    }
+
+                    return value;
+                })
 
         });
     }
@@ -498,7 +519,7 @@ class IpValidator {
         return Joi.object({
 
             step: Joi.number()
-                .valid(constant.FORM_STEPS.CREW_DETAILS)
+                .valid(IP_FORM_STEPS.CREW_DETAILS)
                 .required(),
 
             story_write_aurthor: Joi.string()
@@ -567,7 +588,7 @@ class IpValidator {
         return Joi.object({
 
             step: Joi.number()
-                .valid(constant.FORM_STEPS.CBFC_CERTIFICATION)
+                .valid(IP_FORM_STEPS.CBFC_CERTIFICATION)
                 .required(),
 
             film_is_certified_by_cbfc_or_uncensored: Joi.number()
@@ -628,7 +649,7 @@ class IpValidator {
         return Joi.object({
 
             step: Joi.number()
-                .valid(constant.FORM_STEPS.OTHER_DETAILS)
+                .valid(IP_FORM_STEPS.OTHER_DETAILS)
                 .required(),
 
             film_comletion_during_12month: Joi.number()
@@ -720,7 +741,7 @@ class IpValidator {
         return Joi.object({
 
             step: Joi.number()
-                .valid(constant.FORM_STEPS.DOCUMENTS)
+                .valid(IP_FORM_STEPS.DOCUMENTS)
                 .required(),
 
             // Optional file fields
@@ -737,7 +758,7 @@ class IpValidator {
         return Joi.object({
 
             step: Joi.number()
-                .valid(constant.FORM_STEPS.DECLARATION_PAYMENT)
+                .valid(IP_FORM_STEPS.DECLARATION_PAYMENT)
                 .required(),
         });
     }
@@ -746,22 +767,22 @@ class IpValidator {
         return Joi.object({
 
             step: Joi.number()
-                .valid(constant.FORM_STEPS.SUBMISSION)
+                .valid(IP_FORM_STEPS.SUBMISSION)
                 .required(),
         });
     }
 
     getSchemaForStep(step) {
         const schemas = {
-            [FORM_STEPS.FILM_DETAILS]: this.filmDetailsSchema(),
-            [FORM_STEPS.PRODUCERS_DETAILS]: this.producerDetailsSchema(),
-            [FORM_STEPS.DIRECTORS_DETAILS]: this.directorsDetailsSchema(),
-            [FORM_STEPS.CREW_DETAILS]: this.crewDetailsSchema(),
-            [FORM_STEPS.CBFC_CERTIFICATION]: this.cbfcCertificationSchema(),
-            [FORM_STEPS.OTHER_DETAILS]: this.otherDetailsSchema(),
-            [FORM_STEPS.DOCUMENTS]: this.documentsSchema(),
-            [FORM_STEPS.DECLARATION_PAYMENT]: this.declarationPaymentSchema(),
-            [FORM_STEPS.SUBMISSION]: this.submissionSchema(),
+            [IP_FORM_STEPS.FILM_DETAILS]: this.filmDetailsSchema(),
+            [IP_FORM_STEPS.PRODUCERS_DETAILS]: this.producerDetailsSchema(),
+            [IP_FORM_STEPS.DIRECTORS_DETAILS]: this.directorsDetailsSchema(),
+            [IP_FORM_STEPS.CREW_DETAILS]: this.crewDetailsSchema(),
+            [IP_FORM_STEPS.CBFC_CERTIFICATION]: this.cbfcCertificationSchema(),
+            [IP_FORM_STEPS.OTHER_DETAILS]: this.otherDetailsSchema(),
+            [IP_FORM_STEPS.DOCUMENTS]: this.documentsSchema(),
+            [IP_FORM_STEPS.DECLARATION_PAYMENT]: this.declarationPaymentSchema(),
+            [IP_FORM_STEPS.SUBMISSION]: this.submissionSchema(),
         };
         return schemas[step] || Joi.object();
     }

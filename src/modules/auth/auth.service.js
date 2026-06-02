@@ -109,10 +109,10 @@ class AuthService {
         }
 
         const accessToken = await generateAccessToken(client);
-        const refreshToken = await generateRefereshToken(client);
+        // const refreshToken = await generateRefereshToken(client);
 
         await authRepo.updateClientById(client.id, {
-            token: refreshToken
+            token: accessToken
         });
 
         return {
@@ -120,7 +120,7 @@ class AuthService {
                 token_type: 'bearer',
                 access_token: accessToken,
                 access_token_expiresin: config.jwt.jwtAccessTokenExpiresIn,
-                referesh_token: refreshToken
+                // referesh_token: refreshToken
             },
             client: {
                 id: client.id,

@@ -1,9 +1,8 @@
 import documentRepository from '../../queries/document.repository.js';
-import STEP_FIELD_MAP from '../../constants/formStepFields.js';
-import fileUploadService from '../fileUpload.service.js';
-import AppError from "../../utills/AppError.js";
-import { IP_STEP_FIELD_MAP } from '../../utills/index.js';
 import ipRepository from '../../modules/ip-app/ip.repository.js';
+import { IP_STEP_FIELD_MAP, WEBSITE_TYPE } from '../../constants/index.js';
+import fileUploadHelper from '../../utills/index.js';
+import AppError from "../../utills/AppError.js";
 
 class IpService {
 
@@ -16,7 +15,7 @@ class IpService {
         }
 
         if (entry.client_id.toString() !== clientId.toString()) {
-            throw new AppError("Unauthorized: You can see other's entry.!", 403);
+            throw new AppError("Unauthorized: You can not see other's entry.!", 403);
         }
 
         return entry;
@@ -39,27 +38,28 @@ class IpService {
                 dataToStore[field] = payload[field];
             }
         });
-
         return await ipRepository.create(dataToStore);
     }
 
     async update(payload) {
 
-        // const existingForm = await ipRepository.findById(payload.id, payload.client.id);
+        const existingForm = await ipRepository.getById(payload.id, payload.client.id);
 
-        const existingForm = await this.checkExists(payload.id, payload.client.id);
+        if (!existingForm) {
+            throw new AppError('Entry not found.!', 404);
+        }
+
+        if (existingForm.client_id.toString() !== payload.client.id.toString()) {
+            throw new AppError("Unauthorized: You can not see other's entry.!", 403);
+        }
 
         const currentStep = parseInt(payload.step, 10);
-
-        const currentStepFields = STEP_FIELD_MAP[payload.step] || [];
+        const currentStepFields = IP_STEP_FIELD_MAP[currentStep] || [];
 
         let dataToUpdate = {
             client_id: payload.client.id,
             step: currentStep,
         };
-
-        // console.log(currentStepFields);
-        // return;
 
         currentStepFields.forEach(field => {
             dataToUpdate[field] = payload[field] ?? null;
@@ -76,11 +76,9 @@ class IpService {
             ]);
         }
 
-        // console.log(dataToUpdate);
-        // return;
-
         // Sanitize all data types before sending to Prisma
         const sanitizedData = await this.sanitizePayload(dataToUpdate);
+
         const dbData = await ipRepository.updateById(payload.id, sanitizedData);
 
         if (!dbData) {
@@ -88,13 +86,12 @@ class IpService {
         }
 
         if (payload.files && Object.keys(payload.files).length > 0) {
-            // console.log('For Files');
-            // return;
             const fileData = {
                 ...payload,
-                contextId: payload.id
+                contextId: payload.id,
+                websiteType: WEBSITE_TYPE.IP,
             }
-            const fileupload = await fileUploadService.upload(fileData);
+            const fileupload = await fileUploadHelper.upload(fileData);
             if (!fileupload) {
                 throw new AppError('Something went wrong during upload document.!', 409);
             }
@@ -145,7 +142,6 @@ class IpService {
             if ([
                 'step',
                 'active_step',
-                // 'client_id',
                 'category',
                 'whether_subtitle_english',
                 'dcp',

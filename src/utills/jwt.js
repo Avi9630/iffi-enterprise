@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { config } from "../configs/index.js";
-import { TOKEN_TYPES } from "./constant.js";
+import { TOKEN_TYPES } from "../constants/index.js";
 
 const TOKEN_ERRORS = {
     EXPIRED: 'TokenExpiredError',
