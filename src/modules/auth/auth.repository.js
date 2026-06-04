@@ -41,7 +41,7 @@ class AuthRepository {
         return await prisma.client_types.findUnique({
             where: {
                 id: clientTypeId,
-                status: 'ACTIVE'
+                status: 1
             }
         });
     }
@@ -58,7 +58,7 @@ class AuthRepository {
         return await prisma.clients.update({
             where: { id: clientId },
             data: {
-                status: 'ACTIVE',
+                status: 1,
                 activation_token: null,
             }
         });

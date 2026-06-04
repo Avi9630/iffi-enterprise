@@ -10,12 +10,12 @@ router.use(authMiddleware.verifyToken);
 
 const upload = multer();
 
-// IP-FORM
+// IP APPLICATION-FORM
 
 router
     .post('/add-form', validateRequest(ipValidator.entryFormSchema()), ipController.addForm)
 
-    .put('/update-form/:id', upload.any(), validateStep.validateByStep, ipController.updateForm)
+    .patch('/update-form/:id', upload.any(), validateStep.validateByStep, ipController.updateForm)
     
     .get('/get-form/:id', ipController.getForm)
     

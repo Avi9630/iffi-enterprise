@@ -1,4 +1,7 @@
+import { config } from "../../configs/index.js";
+import { checkCloseTime } from "../../helpers/index.js";
 import ApiResponse from "../../utills/ApiResponse.js"
+import AppError from "../../utills/AppError.js";
 import ipService from './ip.service.js'
 
 class IpController {
@@ -6,11 +9,18 @@ class IpController {
     async addForm(req, res, next) {
         try {
 
+            if (checkCloseTime(config.ipClosingTime)) {
+                throw new AppError('IP submission has been closed.', 400);
+            }
+
             const payload = {
                 ...req.body,
                 client: req.clientDetails
             };
-                        
+
+            // console.log(payload);
+            // return;
+
             const result = await ipService.store(payload);
 
             return ApiResponse(res, 201, {
@@ -24,16 +34,20 @@ class IpController {
 
     async updateForm(req, res, next) {
         try {
+
+            if (checkCloseTime(config.ipClosingTime)) {
+                throw new AppError('IP submission has been closed.', 400);
+            }
+
             const { id } = req.params;
             const payload = {
                 ...req.body,
                 client: req.clientDetails,
                 id,
                 files: req.files,
-                // websiteType: constant.WEBSITE_TYPE.IP,
             };
-            console.log(payload);
-            return
+            // console.log(payload);
+            // return
             const result = await ipService.update(payload);
 
             return ApiResponse(res, 200, {
@@ -49,8 +63,7 @@ class IpController {
         try {
 
             const { id } = req.params;
-            const clientId = req.client.id;
-
+            const clientId = req.clientDetails.id;
             const form = await ipService.getFormById(id, clientId);
 
             return ApiResponse(res, 200, {
@@ -65,12 +78,12 @@ class IpController {
     async deleteForm(req, res, next) {
         try {
             const { id } = req.params;
-            const clientId = req.client.id;
+            const clientId = req.clientDetails.id;
 
             await ipService.deleteFormById(id, clientId);
 
             return ApiResponse(res, 200, {
-                message: "Form deleted successfully!",
+                message: "Entry deleted successfully!",
             });
         } catch (error) {
             next(error);

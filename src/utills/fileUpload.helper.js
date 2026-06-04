@@ -1,11 +1,10 @@
-import documentRepository from "../queries/document.repository.js";
+import commonRepository from "../modules/common/common.repository.js";
 import { IP_DOCUMENT_TYPE } from "../constants/index.js";
+import { config } from "../configs/config.js";
 import AppError from "../utills/AppError.js";
 import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
-import dotenv from 'dotenv'
 import path from 'path';
-dotenv.config()
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,44 +14,51 @@ class FileUploadHelper {
     async upload(payload) {
 
         const { websiteType, contextId, files } = payload;
+
         const uploadedFiles = [];
 
         for (const file of files) {
 
             const fieldName = file.fieldname.toUpperCase();
-            const documentType = IP_DOCUMENT_TYPE[fieldName];
+
+            let documentType
+
+            if (websiteType === 1) {
+                documentType = IP_DOCUMENT_TYPE[fieldName];
+            }
+
+            if (websiteType === 2) {
+                documentType = OTT_DOCUMENT_TYPE[fieldName];
+            }
 
             if (documentType === undefined) {
                 throw new AppError('Envalid document key.!', 422);
             }
 
             const fileDetails = await this.fileDetails(file);
-
+            
             const criteria = {
                 context_id: contextId,
                 website_type: websiteType,
                 document_type: documentType,
             };
-            
-            const documentDetails = await documentRepository.checkExisting(criteria);
-            
-            console.log('bkfjsbkjfdbsdbaksjbdkjasbdjkasbjb kj');
-            console.log(documentDetails);
-            return 'Hello';
 
+            const documentDetails = await commonRepository.checkExisting(criteria);
+            
             if (documentDetails) {
                 await this.removeLocally(documentDetails);
             }
 
             const localResult = await this.saveToLocal(file.buffer, fileDetails.modifiedName, fileDetails.directory);
-            // console.log(localResult);
-            // return;
             const fileData = {
                 doc_name: fileDetails.originalName,
                 modified_name: fileDetails.modifiedName,
                 doc_path: localResult.fullPath,
             };
-            const uploadResult = await documentRepository.saveAndUpdate(criteria, fileData);
+
+            const uploadResult = await commonRepository.saveAndUpdate(criteria, fileData);
+            console.log(uploadResult);
+            // return
             uploadedFiles.push(uploadResult);
         }
         return uploadedFiles;
@@ -83,7 +89,8 @@ class FileUploadHelper {
         return {
             url: relativePath,
             path: filePath,
-            fullPath: `${process.env.BASE_PATH}${relativePath}`
+            fullPath: `${config.basePath}${relativePath}`
+            // fullPath: `${process.env.BASE_PATH}${relativePath}`
         };
     }
 

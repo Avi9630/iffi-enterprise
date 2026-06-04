@@ -84,11 +84,11 @@ export const IP_STEP_FIELD_MAP = Object.freeze({
     ]),
 
     3: Object.freeze([
-        'director_name',
-        'director_email',
-        'director_mobile',
-        'director_address',
-        'director_indian_natinality',
+        // 'director_name',
+        // 'director_email',
+        // 'director_mobile',
+        // 'director_address',
+        // 'director_indian_natinality',
     ]),
 
     4: Object.freeze([

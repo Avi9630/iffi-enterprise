@@ -72,6 +72,10 @@ export const config = {
     databaseUrl: env.DATABASE_URL,
     basePath: env.BASE_PATH,
     frontendUrl: env.FRONTEND_URL,
+    
+    ipClosingTime: env.IP_CLOSING_TIME,
+    ottClosingTime: env.OTT_CLOSING_TIME,
+    cmotClosingTime: env.CMOT_CLOSING_TIME,
 
     redis: {
         host: env.REDIS_HOST,

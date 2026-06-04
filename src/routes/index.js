@@ -1,14 +1,20 @@
+import express from 'express'
+const router = express.Router()
+
+
 import commonRoutes from '../modules/common/common.routes.js'
-import { authRoutes } from '../modules/auth/index.js';
-import { ipRoutes } from '../modules/ip-app/index.js';
-import express from 'express';
+router.use('/common-data', commonRoutes)
 
-const router = express.Router();
+import { authRoutes } from '../modules/auth/index.js'
+router.use('/auth', authRoutes)
 
-router.use('/auth', authRoutes);
+// import { clientRoutes } from '../modules/client/index.js'
+// router.use('/client', clientRoutes)
 
-router.use('/common-data', commonRoutes);
+import { ipRoutes } from '../modules/ip-app/index.js'
+router.use('/ip-app', ipRoutes)
 
-router.use('/ip-app', ipRoutes);
+import { coProducerRoutes } from '../modules/co-producer/index.js'
+router.use('/ip/co-producer', coProducerRoutes)
 
-export default router;
+export default router

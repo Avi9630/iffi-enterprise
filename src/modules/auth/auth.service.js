@@ -1,4 +1,6 @@
 import authRepo from './auth.repository.js';
+import { config } from '../../configs/config.js';
+import { sendMail } from '../../mail/mailer.js';
 import {
     AppError,
     comparePassword,
@@ -8,11 +10,11 @@ import {
     hashPassword,
     verifyToken
 } from '../../utills/index.js';
-import { config } from '../../configs/config.js';
-import { sendMail } from '../../mail/mailer.js';
 import { token } from 'morgan';
 
+
 class AuthService {
+
 
     async registerClient(payload) {
 
@@ -36,7 +38,7 @@ class AuthService {
             throw new AppError('Mobile number already registered', 409);
         }
 
-        const client = await this.createClient(payload);
+        const client = await this._createClient(payload);
 
         if (!client) {
             throw new AppError('Unable to register client.!', 404);
@@ -62,7 +64,7 @@ class AuthService {
         };
     }
 
-    async createClient(payload) {
+    async _createClient(payload) {
 
         const { password, password_confirmation, captcha, client_type_id, ...rest } = payload;
 
@@ -70,6 +72,7 @@ class AuthService {
         const activationToken = await generateActivationToken(payload.email);
 
         const existsClientType = await authRepo.clientTypeById(client_type_id);
+
         if (!existsClientType) {
             throw new AppError('Invalid client type.', 404);
         }
@@ -78,7 +81,7 @@ class AuthService {
             ...rest,
             password_hash: hashedPassword,
             activation_token: activationToken,
-            status: 'INACTIVE',
+            status: 2,
             client_types: {
                 connect: { id: existsClientType.id }
             }
@@ -94,12 +97,12 @@ class AuthService {
             throw new AppError("Invalid email entered.!!", 404);
         }
 
-        if (client.status == 'INACTIVE') {
+        if (client.status === 2) {
             throw new AppError("Account not activated.!!", 422);
         }
 
-        if (client.status == 'BLOCKED') {
-            throw new AppError("Account blocked by ADMIN. Please contact our support!!", 422);
+        if (client.status === 3) {
+            throw new AppError("Account blocked by ADMIN. Please contact our support.!", 422);
         }
 
         const isMatch = await comparePassword(payload.password, client.password_hash);
@@ -148,7 +151,7 @@ class AuthService {
             throw new AppError("Account not found.!", 404);
         }
 
-        if (client.status == 'BLOCKED') {
+        if (client.status == 3) {
             throw new AppError("Account blocked by ADMIN. Please contact our support!!", 422);
         }
 
@@ -193,7 +196,7 @@ class AuthService {
             throw new AppError('Email not registered with us. Please register.!', 404);
         }
 
-        if (client.status == 'BLOCKED') {
+        if (client.status == 3) {
             throw new AppError("Account blocked by ADMIN. Please contact our support!!", 422);
         }
 
@@ -203,34 +206,23 @@ class AuthService {
 
         await authRepo.updateClientById(client.id, client);
 
-        await sendMail({
-            to: client.email,
-            subject: "Welcome to the International Film Festival of India!",
-            templateName: "registration.ejs",
-            context: {
-                client_name: client.first_name + ' ' + client.last_name,
-                client_email: client.email,
-                frontend_base_url: config.frontendUrl,
-                activate_token: client.activation_token
-            }
-        });
+        // await sendMail({
+        //     to: client.email,
+        //     subject: "Welcome to the International Film Festival of India!",
+        //     templateName: "registration.ejs",
+        //     context: {
+        //         client_name: client.first_name + ' ' + client.last_name,
+        //         client_email: client.email,
+        //         frontend_base_url: config.frontendUrl,
+        //         activate_token: client.activation_token
+        //     }
+        // });
 
-    }
-
-    async findExistingClient(email) {
-
-        const client = await authRepo.findByEmail(email);
-
-        if (!client) {
-            throw new AppError('Account not found.! Please register an account.!', 404);
-        }
-
-        return client;
     }
 
     async resetPassword(email, ip) {
 
-        const client = await this.findExistingClient(email);
+        const client = await this._findExistingClient(email);
 
         const existingOtp = await authRepo.getOtpCodesByClient(client.id);
 
@@ -238,7 +230,7 @@ class AuthService {
         if (existingOtp) {
             otpCodes = await this.resendOtp(existingOtp);
         } else {
-            otpCodes = await this.sendOtp(type, target, client, ip);
+            otpCodes = await this.sendOtp(email, client, ip);
         }
 
         // await sendMail({
@@ -256,13 +248,14 @@ class AuthService {
         return otpCodes;
     }
 
-    async sendOtp(type, target, client, ip) {
+    async sendOtp(email, client, ip) {
+
         const EXPIRES_AT = new Date(Date.now() + 10 * 60 * 1000);
         const OTP = Math.floor(100000 + Math.random() * 900000);
+
         const dataToAdd = {
             client_id: client.id,
-            type,
-            target,
+            target: email,
             otp: OTP,
             ip_address: ip,
             expires_at: EXPIRES_AT
@@ -272,6 +265,7 @@ class AuthService {
     }
 
     async resendOtp(existingOtp) {
+
         const COOLDOWN_MS = 60 * 1000;
         const EXPIRES_AT = new Date(Date.now() + 10 * 60 * 1000);
         const age = Date.now() - new Date(existingOtp.created_at).getTime();
@@ -288,7 +282,7 @@ class AuthService {
         const record = await authRepo.updateOtpById(existingOtp.id,
             {
                 otp: OTP,
-                status: 'PENDING',
+                status: 2,
                 attempts: 0,
                 expires_at: EXPIRES_AT,
                 verified_at: null
@@ -314,8 +308,12 @@ class AuthService {
             throw new AppError('OTP has expired. Please request a new one.', 422);
         }
 
-        if (otpCode.status == 'VERIFIED') {
+        if (otpCode.status == 1) {
             throw new AppError('OTP already verified, Please resend OTP again.!', 422);
+        }
+
+        if (otpCode.attempts === 3) {
+            throw new AppError('No attempts left. Please request a new OTP.', 422);
         }
 
         const MAX_ATTEMPTS = 3;
@@ -323,10 +321,9 @@ class AuthService {
         if (otpCode.otp != otp) {
 
             if (otpCode.attempts < MAX_ATTEMPTS) {
+
                 otpCode.attempts += 1;
-
                 await authRepo.updateOtpById(otpCode.id, otpCode);
-
                 const attemptsLeft = MAX_ATTEMPTS - otpCode.attempts;
 
                 if (attemptsLeft === 0) {
@@ -342,12 +339,8 @@ class AuthService {
             }
         }
 
-
-        // otpCode.status = 'VERIFIED';
-        // otpCode.verified_at = new Date();
-
         await authRepo.updateOtpById(otpCode.id, {
-            status: 'VERIFIED',
+            status: 1,
             verified_at: new Date()
         });
         return otpCode;
@@ -370,6 +363,25 @@ class AuthService {
     async logout(client) {
         await authRepo.updateClientById(client.id, { token: null });
         return true
+    }
+
+    async _findExistingClient(email) {
+
+        const client = await authRepo.findByEmail(email);
+
+        if (!client) {
+            throw new AppError('Account not found.! Please register an account.!', 404);
+        }
+
+        if (client.status === 2) {
+            throw new AppError("Account not activated.!", 422);
+        }
+
+        if (client.status === 3) {
+            throw new AppError('Account blocked by ADMIN. Please contact our support.!', 422);
+        }
+
+        return client;
     }
 
 }

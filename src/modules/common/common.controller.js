@@ -23,6 +23,7 @@ class CommonController {
     async handlers(type, req) {
         const handle = {
             'client-type-list': () => commonRepository.clientTypeList(),
+            'client-list':() => commonRepository.clientList(),
             'language-list': () => commonRepository.languageList(),
             'genre': () => commonRepository.genreList(),
             'country': () => commonRepository.countryList(),

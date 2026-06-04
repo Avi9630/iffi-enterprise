@@ -9,8 +9,7 @@ class ValidateStepMiddleware {
         this.validateByStep = this.validateByStep.bind(this);
     }
 
-
-    async validateByStep(req, res, next){
+    async validateByStep(req, res, next) {
         try {
             const { step } = req.body;
 
@@ -25,7 +24,6 @@ class ValidateStepMiddleware {
             }
 
             const validSteps = Object.values(IP_FORM_STEPS);
-
             if (!validSteps.includes(Number(step))) {
                 return res.status(400).json({
                     status: false,
@@ -36,22 +34,14 @@ class ValidateStepMiddleware {
                 });
             }
 
-            /**
-             * File Validation
-             */
-            // console.log("hello");
-            const fileErrors = this.validateFiles(Number(step), req.files || []);
-            // console.log(fileErrors);
-            // return;
-
-            if (Object.keys(fileErrors).length > 0) {
-                return res.status(400).json({
-                    status: false,
-                    message: "Validation error",
-                    errors: fileErrors
-                });
-            }
-
+            // const fileErrors = this.validateFiles(Number(step), req.files || []);
+            // if (Object.keys(fileErrors).length > 0) {
+            //     return res.status(400).json({
+            //         status: false,
+            //         message: "Validation error",
+            //         errors: fileErrors
+            //     });
+            // }
 
             const schema = ipValidator.getSchemaForStep(Number(step));
 
@@ -64,41 +54,43 @@ class ValidateStepMiddleware {
             return validateRequest(schema)(req, res, next);
 
         } catch (error) {
-            // if (error instanceof AppError) {
-            //     return res.status(error.statusCode).json({
-            //         status: error.status,
-            //         message: error.message,
-            //         errors: error.errors
-            //     });
-            // }
-
-            // return res.status(400).json({
-            //     status: false,
-            //     message: "Validation error",
-            //     errors: {
-            //         step: "step is required"
-            //     }
-            // });
+            if (error instanceof AppError) {
+                return res.status(error.statusCode).json({
+                    status: error.status,
+                    message: error.message,
+                    errors: error.errors
+                });
+            }
 
             next(error);
         }
     };
 
     validateFiles(step, files = []) {
-        console.log('AAAAAAAAAAAAAAAA');
-        
+
         const fileRules = {
             [IP_FORM_STEPS.PRODUCERS_DETAILS]: [
                 'producer_id_proof'
             ],
 
-            [IP_FORM_STEPS.DIRECTOR_DETAILS]: [
-                'director_id_proof'
-            ],
+            // [IP_FORM_STEPS.DIRECTORS_DETAILS]: [
+            //     'director_id_proof'
+            // ],
 
             // Example future steps
-            [IP_FORM_STEPS.CERTIFICATE_DETAILS]: [
-                'certificate_file'
+            [IP_FORM_STEPS.CBFC_CERTIFICATION]: [
+                'file_cbfc_certificate',
+                'declaration_clause_file',
+                'uncensored_file'
+            ],
+
+            [IP_FORM_STEPS.DOCUMENTS]: [
+                'authorization_latter',
+                'declaration_latter',
+                'synopsis_in_english',
+                'directors_profile',
+                'producers_profile',
+                'details_of_cast_crew',
             ]
         };
 

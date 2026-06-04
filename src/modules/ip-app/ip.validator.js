@@ -445,7 +445,7 @@ class IpValidator {
                 otherwise: Joi.optional()
             }),
 
-            producer_id_proof: Joi.required()
+            // producer_id_proof: Joi.required()
         });
     }
 
@@ -456,61 +456,41 @@ class IpValidator {
                 .valid(IP_FORM_STEPS.DIRECTORS_DETAILS)
                 .required(),
 
-            director_name: Joi.string()
-                .trim()
-                .required(),
+            // director_name: Joi.string()
+            //     .trim()
+            //     .required(),
 
-            director_email: Joi.string()
-                .trim()
-                .email()
-                .required(),
+            // director_email: Joi.string()
+            //     .trim()
+            //     .email()
+            //     .required(),
 
-            director_landline: Joi.string()
-                .trim()
-                .allow('', null),
+            // director_landline: Joi.string()
+            //     .trim()
+            //     .allow('', null),
 
-            director_mobile: Joi.string()
-                .trim()
-                .required(),
+            // director_mobile: Joi.string()
+            //     .trim()
+            //     .required(),
 
-            director_fax: Joi.string()
-                .trim()
-                .allow('', null),
+            // director_fax: Joi.string()
+            //     .trim()
+            //     .allow('', null),
 
-            director_website: Joi.string()
-                .trim()
-                .uri()
-                .allow('', null),
+            // director_website: Joi.string()
+            //     .trim()
+            //     .uri()
+            //     .allow('', null),
 
-            director_address: Joi.string()
-                .trim()
-                .required(),
+            // director_address: Joi.string()
+            //     .trim()
+            //     .required(),
 
-            director_indian_natinality: Joi.number()
-                .valid(1)
-                .required(),
+            // director_indian_natinality: Joi.number()
+            //     .valid(1)
+            //     .required(),
 
             // director_id_proof: Joi.object().required()
-
-            director_id_proof: Joi.object()
-                .required()
-                .custom((value, helpers) => {
-                    const allowedTypes = [
-                        'image/jpeg',
-                        'image/png',
-                        'application/pdf'
-                    ];
-
-                    if (!allowedTypes.includes(value.mimetype)) {
-                        return helpers.message('Only JPG, PNG and PDF files are allowed');
-                    }
-
-                    if (value.size > 5 * 1024 * 1024) {
-                        return helpers.message('File size must be less than 5 MB');
-                    }
-
-                    return value;
-                })
 
         });
     }
@@ -596,6 +576,7 @@ class IpValidator {
                 .required(),
 
             // Required when value = 1
+            
             date_of_cbfc_certificate: Joi.when(
                 'film_is_certified_by_cbfc_or_uncensored',
                 {
@@ -639,9 +620,9 @@ class IpValidator {
             ),
 
             // Optional file fields
-            file_cbfc_certificate: Joi.any(),
-            declaration_clause_file: Joi.any(),
-            uncensored_file: Joi.any(),
+            // file_cbfc_certificate: Joi.any(),
+            // declaration_clause_file: Joi.any(),
+            // uncensored_file: Joi.any(),
         });
     }
 
@@ -745,12 +726,12 @@ class IpValidator {
                 .required(),
 
             // Optional file fields
-            authorization_latter: Joi.any(),
-            declaration_latter: Joi.any(),
-            synopsis_in_english: Joi.any(),
-            directors_profile: Joi.any(),
-            producers_profile: Joi.any(),
-            details_of_cast_crew: Joi.any(),
+            // authorization_latter: Joi.any(),
+            // declaration_latter: Joi.any(),
+            // synopsis_in_english: Joi.any(),
+            // directors_profile: Joi.any(),
+            // producers_profile: Joi.any(),
+            // details_of_cast_crew: Joi.any(),
         });
     }
 

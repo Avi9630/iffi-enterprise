@@ -2,10 +2,13 @@
 class SanitizeHelper {
 
     async coProducerSanitize(data) {
+
         const sanitized = {};
 
         for (const [key, value] of Object.entries(data)) {
+
             if (value === undefined) continue;
+            
             if ([
                 'ip_application_form_id',
                 'co_producer_is',
