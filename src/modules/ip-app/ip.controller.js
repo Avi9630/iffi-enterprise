@@ -40,11 +40,12 @@ class IpController {
             }
 
             const { id } = req.params;
+            const allFiles = Object.values(req.files).flat();
             const payload = {
                 ...req.body,
                 client: req.clientDetails,
                 id,
-                files: req.files,
+                files: allFiles,
             };
             // console.log(payload);
             // return
@@ -64,7 +65,7 @@ class IpController {
 
             const { id } = req.params;
             const clientId = req.clientDetails.id;
-            const form = await ipService.getFormById(id, clientId);
+            const form = await ipService.getForm(id, clientId);
 
             return ApiResponse(res, 200, {
                 message: "Form retrieved successfully!",

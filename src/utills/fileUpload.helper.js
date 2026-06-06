@@ -22,21 +22,20 @@ class FileUploadHelper {
             const fieldName = file.fieldname.toUpperCase();
 
             let documentType
-
             if (websiteType === 1) {
                 documentType = IP_DOCUMENT_TYPE[fieldName];
             }
 
-            if (websiteType === 2) {
-                documentType = OTT_DOCUMENT_TYPE[fieldName];
-            }
+            // if (websiteType === 2) {
+            //     documentType = OTT_DOCUMENT_TYPE[fieldName];
+            // }
 
             if (documentType === undefined) {
                 throw new AppError('Envalid document key.!', 422);
             }
 
-            const fileDetails = await this.fileDetails(file);
-            
+            const fileDetails = await this._fileDetails(file);
+
             const criteria = {
                 context_id: contextId,
                 website_type: websiteType,
@@ -44,27 +43,25 @@ class FileUploadHelper {
             };
 
             const documentDetails = await commonRepository.checkExisting(criteria);
-            
+
             if (documentDetails) {
                 await this.removeLocally(documentDetails);
             }
 
-            const localResult = await this.saveToLocal(file.buffer, fileDetails.modifiedName, fileDetails.directory);
+            const localResult = await this._saveToLocal(file.buffer, fileDetails.modifiedName, fileDetails.directory);
             const fileData = {
                 doc_name: fileDetails.originalName,
                 modified_name: fileDetails.modifiedName,
                 doc_path: localResult.fullPath,
             };
-
             const uploadResult = await commonRepository.saveAndUpdate(criteria, fileData);
             console.log(uploadResult);
-            // return
             uploadedFiles.push(uploadResult);
         }
         return uploadedFiles;
     }
 
-    async fileDetails(file) {
+    async _fileDetails(file) {
 
         const originalName = file.originalname;
         const fileName = path.parse(originalName).name;
@@ -75,7 +72,7 @@ class FileUploadHelper {
 
     }
 
-    async saveToLocal(buffer, filename, directory) {
+    async _saveToLocal(buffer, filename, directory) {
 
         try {
             await fs.access(directory);

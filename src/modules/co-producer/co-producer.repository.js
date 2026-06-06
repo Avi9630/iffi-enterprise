@@ -44,6 +44,15 @@ class CoProducerRepository {
         });
     }
 
+    async validateIpForm(ipFormId, clientId) {
+        return await prisma.ip_application_forms.findUnique({
+            where: {
+                id: ipFormId,
+                client_id: clientId
+            }
+        });
+    }
+
     async findByIdWithDoc(id) {
         const coProducer = await prisma.ip_co_producers.findFirst({
             where: { id }

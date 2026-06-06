@@ -1,26 +1,5 @@
 import Joi from 'joi';
 
-// File object validator - Multer file structure validate karta hai
-
-// const fileSchema = Joi.object({
-//     fieldname: Joi.string().required(),
-//     originalname: Joi.string().required(),
-//     encoding: Joi.string().required(),
-//     mimetype: Joi.string()
-//         .valid('image/jpeg', 'image/png', 'image/jpg', 'application/pdf')
-//         .required()
-//         .messages({
-//             'any.only': '{{#label}} must be jpeg, png, or pdf'
-//         }),
-//     buffer: Joi.binary().required(),
-//     size: Joi.number()
-//         .max(5 * 1024 * 1024)  // 5MB max
-//         .required()
-//         .messages({
-//             'number.max': '{{#label}} must be less than 5MB'
-//         }),
-// }).unknown(true);
-
 const fileSchema = Joi.object({
 
     fieldname: Joi.string().required(),
@@ -51,13 +30,18 @@ const fileSchema = Joi.object({
 
 class CoProducerValidator {
 
+    paramsSchema() {
+        return Joi.object({
+            ip_form_id: Joi.number().required(),
+        });
+    }
+
     addCoProducerSchema() {
         return Joi.object({
+            
+            ip_application_form_id: Joi.number().required(),
 
-            ip_application_form_id: Joi.number()
-                .required(),
-
-            co_producer_is: Joi.number()
+            type: Joi.number()
                 .valid(1, 2)
                 .required(),
 
@@ -136,7 +120,7 @@ class CoProducerValidator {
             ip_application_form_id: Joi.number()
                 .required(),
 
-            co_producer_is: Joi.number()
+            type: Joi.number()
                 .valid(1, 2)
                 .required(),
 

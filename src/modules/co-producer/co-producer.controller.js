@@ -8,15 +8,13 @@ class CoProducerController {
     async addCoProducer(req, res, next) {
         try {
 
+            const allFiles = Object.values(req.files).flat();
             const payload = {
                 ...req.body,
                 clientId: req.clientDetails.id,
-                files: req.files,
-                websiteType: WEBSITE_TYPE.IP,
+                files: allFiles,
             };
-
-            console.log(payload);
-            return;
+                     
             const result = await coProducerService.store(payload);
 
             return ApiResponse(res, 201, {
@@ -30,14 +28,13 @@ class CoProducerController {
 
     async updateCoProducer(req, res, next) {
         try {
-
+            const allFiles = Object.values(req.files).flat();
             const { id } = req.params;
             const payload = {
                 ...req.body,
-                client: req.client,
+                clientId: req.clientDetails.id,
                 id,
-                files: req.files,
-                websiteType: constant.WEBSITE_TYPE.IP,
+                files: allFiles,
             };
 
             // console.log(payload);
@@ -46,7 +43,7 @@ class CoProducerController {
             const result = await coProducerService.update(payload);
 
             return ApiResponse(res, 201, {
-                message: "Co-producer(s) added successfully.!",
+                message: "Co-producer(s) updated successfully.!",
                 data: result
             });
         } catch (error) {

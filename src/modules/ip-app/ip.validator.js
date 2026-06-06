@@ -443,9 +443,8 @@ class IpValidator {
                 is: 0,
                 then: Joi.string().required(),
                 otherwise: Joi.optional()
-            }),
-
-            // producer_id_proof: Joi.required()
+            }),            
+            // producer_id_proof: Joi.any()
         });
     }
 

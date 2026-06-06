@@ -1,41 +1,37 @@
 import coProducerRepository from './co-producer.repository.js';
-// import ipRepository from "../../queries/ip/ip.repository.js";
-// import documentRepository from '../../queries/document.repository.js';
 import fileUploadHelper from '../../utills/index.js';
 import AppError from "../../utills/AppError.js";
+import { WEBSITE_TYPE } from '../../constants/common.constant.js';
+
+const PRODUCER_DOCUMENT_MAP = Object.freeze([
+    'co_producer_id_proof',
+    'passport_image'
+]);
 
 class CoProducerService {
 
-    async _validateClient() {
+    async _validateIpForm(payload) {
 
-        const entry = await ipRepository.findById(payload.ip_application_form_id, payload.clientId);
-        console.log(entry);
-        return;
-
-        if (!form) {
-            throw new AppError('Form not found. Please enter valid application Id', 404);
+        const entry = await coProducerRepository.validateIpForm(payload.ip_application_form_id, payload.clientId);
+        if (!entry) {
+            throw new AppError('Ip entries not found.! Please enter valid application Id', 404);
         }
+
+        if (entry.client_id.toString() !== payload.clientId.toString()) {
+            throw new AppError('Unauthorized: You can only add co-producers to your own forms', 403);
+        }
+
     }
 
     async store(payload) {
 
-        await this._validateClient();
+        const { files } = payload;
 
-        console.log(entry);
-        return;
-        const entry = await ipRepository.findById(payload.ip_application_form_id, payload.clientId);
-
-        if (!form) {
-            throw new AppError('Form not found. Please enter valid application Id', 404);
-        }
-
-        if (form.client_id.toString() !== payload.clientId.toString()) {
-            throw new AppError('Unauthorized: You can only add co-producers to your own forms', 403);
-        }
+        await this._validateIpForm(payload);
 
         const dataToStore = {
             ip_application_form_id: BigInt(payload.ip_application_form_id),
-            co_producer_is: Number(payload.co_producer_is),
+            type: Boolean(Number(payload.type)),
 
             name: payload.name,
             email: payload.email,
@@ -56,14 +52,28 @@ class CoProducerService {
             throw new AppError('Something went wrong', 400);
         }
 
-        if (payload.files && Object.keys(payload.files).length > 0) {
-            const fileData = {
-                ...payload,
-                contextId: coProducer.id
+        // File allowed or not
+        if (files?.length > 0) {
+
+            const allowedDocuments = PRODUCER_DOCUMENT_MAP;
+
+            for (const file of files) {
+                if (!allowedDocuments.includes(file.fieldname)) {
+                    throw new AppError(
+                        `Document '${file.fieldname}' is not allowed.`,
+                        422
+                    );
+                }
             }
-            const fileupload = await fileUploadHelper.upload(fileData);
-            if (!fileupload) {
-                throw new AppError('Something went wrong during upload document.!', 409);
+
+            const uploaded = await fileUploadHelper.upload({
+                ...payload,
+                contextId: coProducer.id,
+                websiteType: WEBSITE_TYPE.IP,
+            });
+
+            if (!uploaded) {
+                throw new AppError('Something went wrong during document upload.', 409);
             }
         }
         return coProducer;
@@ -71,12 +81,12 @@ class CoProducerService {
 
     async update(payload) {
 
-        const form = await ipRepository.findById(payload.ip_application_form_id, payload.clientId);
-        if (!form) {
-            throw new AppError('Form not found. Please enter valid application Id', 404);
-        }
+        const { id, files } = payload;
 
-        const existingCoProducer = await coProducerRepository.findByFormId(payload.id);
+        await this._validateIpForm(payload);
+
+        const existingCoProducer = await coProducerRepository.findByFormId(id);
+
         if (!existingCoProducer) {
             throw new AppError("Co-producer entry not found!!", 404);
         }
@@ -87,7 +97,7 @@ class CoProducerService {
 
         const dataToStore = {
             ip_application_form_id: BigInt(payload.ip_application_form_id),
-            co_producer_is: Number(payload.co_producer_is),
+            type: Boolean(Number(payload.type)),
             name: payload.name,
             email: payload.email,
             mobile: payload.mobile,
@@ -100,23 +110,37 @@ class CoProducerService {
             name_of_producers: payload.name_of_producers ?? null,
         };
 
-        const dbData = await coProducerRepository.updateByFormId(payload.id, dataToStore);
+        const coProducerUpdated = await coProducerRepository.updateByFormId(id, dataToStore);
 
-        if (!dbData) {
+        if (!coProducerUpdated) {
             throw new AppError('Something went wrong during update.!', 409);
         }
 
-        if (payload.files && Object.keys(payload.files).length > 0) {
-            const fileData = {
-                ...payload,
-                contextId: existingCoProducer.id
+        // File allowed or not
+        if (files?.length > 0) {
+
+            const allowedDocuments = PRODUCER_DOCUMENT_MAP;
+
+            for (const file of files) {
+                if (!allowedDocuments.includes(file.fieldname)) {
+                    throw new AppError(
+                        `Document '${file.fieldname}' is not allowed.`,
+                        422
+                    );
+                }
             }
-            const fileupload = await fileUploadHelper.upload(fileData);
-            if (!fileupload) {
-                throw new AppError('Something went wrong during upload document.!', 409);
+
+            const uploaded = await fileUploadHelper.upload({
+                ...payload,
+                contextId: coProducerUpdated.id,
+                websiteType: WEBSITE_TYPE.IP,
+            });
+
+            if (!uploaded) {
+                throw new AppError('Something went wrong during document upload.', 409);
             }
         }
-        return dbData;
+        return coProducerUpdated;
     }
 
     async getFormById(id, clientId) {

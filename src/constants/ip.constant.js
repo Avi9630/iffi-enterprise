@@ -29,6 +29,7 @@ export const IP_DOCUMENT_TYPE = Object.freeze({
     UPLOAD_CV: 16,
     UPLOAD_REEL: 17,
     CO_PRODUCER_ID_PROOF: 18,
+    REQUISITE_DOCUMENTS:19
 });
 
 export const IP_STEP_FIELD_MAP = Object.freeze({
@@ -128,6 +129,48 @@ export const IP_STEP_FIELD_MAP = Object.freeze({
     ]),
 
     7: Object.freeze([
+        'requisite_documents'
+    ]),
+
+    8: Object.freeze([]),
+
+    9: Object.freeze([]),
+});
+
+export const IP_STEP_DOCUMENT_MAP = Object.freeze({
+
+    1: Object.freeze([
+        
+    ]),
+
+    2: Object.freeze([
+        'producer_id_proof'
+    ]),
+
+    3: Object.freeze([
+        'director_id_proof'
+    ]),
+
+    4: Object.freeze([
+    ]),
+
+    5: Object.freeze([
+        'file_cbfc_certificate',
+        'declaration_clause_file',
+        'uncensored_file',
+    ]),
+
+    6: Object.freeze([
+        
+    ]),
+
+    7: Object.freeze([
+        'authorization_latter',
+        'declaration_latter',
+        'synopsis_in_english',
+        'directors_profile',
+        'producers_profile',
+        'details_of_cast_crew',
         'requisite_documents'
     ]),
 

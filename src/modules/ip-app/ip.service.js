@@ -1,6 +1,6 @@
 import documentRepository from '../../queries/document.repository.js';
 import ipRepository from '../../modules/ip-app/ip.repository.js';
-import { IP_STEP_FIELD_MAP, WEBSITE_TYPE } from '../../constants/index.js';
+import { IP_STEP_DOCUMENT_MAP, IP_STEP_FIELD_MAP, WEBSITE_TYPE } from '../../constants/index.js';
 import fileUploadHelper from '../../utills/index.js';
 import AppError from "../../utills/AppError.js";
 
@@ -41,6 +41,11 @@ const NUMERIC_FIELDS = new Set([
     'confirmation_neither_released_nor_planned',
     'is_ip_award',
     'enclosed_the_declaration_letter',
+    'status',
+]);
+
+const BOOLEAN_FIELDS = new Set([
+    'status',
 ]);
 
 class IpService {
@@ -68,25 +73,14 @@ class IpService {
 
     async update(payload) {
 
-        const { id, client, step: rawStep, files } = payload;
-
-        // const existingForm = await ipRepository.getById(id, client.id);
-        const existingForm = await this.checkExists(id, client.id);
-
-        // if (!existingForm) {
-        // throw new AppError('Entry not found.!', 404);
-        // }
-
-        // if (existingForm.client_id.toString() !== client.id.toString()) {
-        // throw new AppError("Unauthorized: You can not see another user's entry.!", 403);
-        // }
+        const { id, client, files } = payload;
+        const existingForm = await this._checkExists(id, client.id);
 
         if (existingForm.step === 9) {
             throw new AppError("Changes not allowed.! Form already submitted.", 403);
         }
 
         const currentStep = parseInt(payload.step, 10);
-
         const stepFields = IP_STEP_FIELD_MAP[currentStep] || [];
 
         let dataToUpdate = {
@@ -98,21 +92,49 @@ class IpService {
             dataToUpdate[field] = payload[field] ?? null;
         });
 
-        if (!existingForm.active_step || existingForm.active_step < currentStep) { dataToUpdate.active_step = currentStep; } if
-            (dataToUpdate.step === 5) {
-            dataToUpdate = this.convertDateFields(dataToUpdate, ['date_of_cbfc_certificate'
-                , 'date_of_completion_production']);
-        } if (dataToUpdate.step === 9) {
-            if (existingForm.payment_status !== 'SUCCESS') { throw new AppError("Your has not been completed yet.! Please wait till payment success.!.", 403); }
-            dataToUpdate.status = 'COMPLETE'
-        } // Sanitize all data types before sending to Prisma const
-        sanitizedData = this.sanitizePayload(dataToUpdate); const dbData = await ipRepository.updateById(payload.id,
-            sanitizedData); if (!dbData) { throw new AppError('Something went wrong during update.!', 409); } if (payload.files
-                && Object.keys(payload.files).length > 0) {
+        if (!existingForm.active_step || existingForm.active_step < currentStep) {
+            dataToUpdate.active_step = currentStep;
+        }
+
+        if (dataToUpdate.step === 5) {
+            dataToUpdate = this._convertDateFields(dataToUpdate, ['date_of_cbfc_certificate', 'date_of_completion_production']);
+        }
+
+        if (dataToUpdate.step === 9) {
+            if (existingForm.payment_status !== 1) {
+                throw new AppError("Your payment has not been completed yet.! Please wait till payment success.!.", 403);
+            }
+            dataToUpdate.status = true
+        }
+
+        // Sanitize all data types before sending to Prisma const
+        const sanitizedData = await this._sanitizePayload(dataToUpdate);
+
+        // console.log(sanitizedData);
+        // return;
+
+        const dbData = await ipRepository.updateById(payload.id, sanitizedData);
+        if (!dbData) {
+            throw new AppError('Something went wrong during update.!', 409);
+        }
+
+        // File allowed or not
+        if (files?.length > 0) {
+
+            const allowedDocuments = IP_STEP_DOCUMENT_MAP[currentStep] || [];
+
+            for (const file of files) {
+                if (!allowedDocuments.includes(file.fieldname)) {
+                    throw new AppError(
+                        `Document '${file.fieldname}' is not allowed for step ${currentStep}`,
+                        422
+                    );
+                }
+            }
 
             const uploaded = await fileUploadHelper.upload({
                 ...payload,
-                contextId: id,
+                contextId: payload.id,
                 websiteType: WEBSITE_TYPE.IP,
             });
 
@@ -123,9 +145,9 @@ class IpService {
         return dbData;
     }
 
-    async getFormById(id, clientId) {
+    async getForm(id, clientId) {
 
-        await this.checkExists(id, clientId);
+        await this._checkExists(id, clientId);
         const entry = await ipRepository.getByAllSub(id, clientId);
         return entry;
     }
@@ -152,7 +174,7 @@ class IpService {
         }
     }
 
-    async checkExists(id, clientId) {
+    async _checkExists(id, clientId) {
 
         const existingEntry = await ipRepository.getById(id, clientId);
 
@@ -167,9 +189,9 @@ class IpService {
         return existingEntry;
     }
 
-    sanitizePayload(data) {
-
+    async _sanitizePayload(data) {
         const sanitized = {};
+
         for (const [key, value] of Object.entries(data)) {
             if (value === undefined) continue;
 
@@ -178,7 +200,9 @@ class IpService {
                 continue;
             }
 
-            if (NUMERIC_FIELDS.has(key)) {
+            if (BOOLEAN_FIELDS.has(key)) {
+                sanitized[key] = Boolean(value);  // 1→true, 0→false, true→true
+            } else if (NUMERIC_FIELDS.has(key)) {
                 const parsed = parseInt(value, 10);
                 sanitized[key] = isNaN(parsed) ? null : parsed;
             } else {
@@ -188,7 +212,7 @@ class IpService {
         return sanitized;
     }
 
-    convertDateFields(data, dateFields = []) {
+    _convertDateFields(data, dateFields = []) {
         const converted = { ...data };
         dateFields.forEach(field => {
             if (converted[field] && typeof converted[field] === 'string') {
@@ -197,7 +221,7 @@ class IpService {
         });
         return converted;
     }
-    
+
     // async getClientForms(client_id) {
     // return await ipRepository.findByClientId(client_id);
     // }

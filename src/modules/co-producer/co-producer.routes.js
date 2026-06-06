@@ -10,20 +10,14 @@ router.use(authMiddleware.verifyToken);
 
 const upload = multer();
 
-// CO-PRODUCERS-ROUTES
-// router
-//     .post('/add',
-//         upload.any(),
-//         validateRequest(coProducerValidator.addCoProducerSchema()),
-//         coProducerController.addCoProducer)
-
 router.post('/add',
     upload.any(),
-    validateRequest(coProducerValidator.addCoProducerSchema()),
+    // validateRequest(coProducerValidator.paramsSchema(), 'params'),
+    validateRequest(coProducerValidator.addCoProducerSchema(), 'body'),
     coProducerController.addCoProducer
 );
 
-router.put('/update-co-producer/:id',
+router.patch('/update/:id',
     upload.any(),
     validateRequest(coProducerValidator.updateCoProducerSchema()),
     coProducerController.updateCoProducer
