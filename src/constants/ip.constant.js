@@ -1,4 +1,39 @@
-const STEP_FIELD_MAP = Object.freeze({
+export const IP_FORM_STEPS = Object.freeze({
+    FILM_DETAILS: 1,
+    PRODUCERS_DETAILS: 2,
+    DIRECTORS_DETAILS: 3,
+    CREW_DETAILS: 4,
+    CBFC_CERTIFICATION: 5,
+    OTHER_DETAILS: 6,
+    DOCUMENTS: 7,
+    DECLARATION_PAYMENT: 8,
+    SUBMISSION: 9
+});
+
+export const IP_DOCUMENT_TYPE = Object.freeze({
+    PRODUCER_ID_PROOF: 1,
+    DIRECTOR_ID_PROOF: 2,
+    UNCENSORED_FILE: 3,
+    DECLARATION_CLAUSE_FILE: 4,
+    FILE_CBFC_CERTIFICATE: 5,
+    AUTHORIZATION_LATTER: 6,
+    DECLARATION_LATTER: 7,
+    SYNOPSIS_IN_ENGLISH: 8,
+    DIRECTORS_PROFILE: 9,
+    PRODUCERS_PROFILE: 10,
+    DETAILS_OF_CAST_CREW: 11,
+    GOV_ID_PROOF: 12,
+    PASSPORT_IMAGE: 13,
+    FIRST_GOV_ID_PROOF: 14,
+    SECOND_GOV_ID_PROOF: 15,
+    UPLOAD_CV: 16,
+    UPLOAD_REEL: 17,
+    CO_PRODUCER_ID_PROOF: 18,
+    REQUISITE_DOCUMENTS:19
+});
+
+export const IP_STEP_FIELD_MAP = Object.freeze({
+
     1: Object.freeze([
         'category',
         'title_of_film_in_roman',
@@ -50,11 +85,11 @@ const STEP_FIELD_MAP = Object.freeze({
     ]),
 
     3: Object.freeze([
-        'director_name',
-        'director_email',
-        'director_mobile',
-        'director_address',
-        'director_indian_natinality',
+        // 'director_name',
+        // 'director_email',
+        // 'director_mobile',
+        // 'director_address',
+        // 'director_indian_natinality',
     ]),
 
     4: Object.freeze([
@@ -98,8 +133,48 @@ const STEP_FIELD_MAP = Object.freeze({
     ]),
 
     8: Object.freeze([]),
-    
+
     9: Object.freeze([]),
 });
 
-export default STEP_FIELD_MAP;
+export const IP_STEP_DOCUMENT_MAP = Object.freeze({
+
+    1: Object.freeze([
+        
+    ]),
+
+    2: Object.freeze([
+        'producer_id_proof'
+    ]),
+
+    3: Object.freeze([
+        'director_id_proof'
+    ]),
+
+    4: Object.freeze([
+    ]),
+
+    5: Object.freeze([
+        'file_cbfc_certificate',
+        'declaration_clause_file',
+        'uncensored_file',
+    ]),
+
+    6: Object.freeze([
+        
+    ]),
+
+    7: Object.freeze([
+        'authorization_latter',
+        'declaration_latter',
+        'synopsis_in_english',
+        'directors_profile',
+        'producers_profile',
+        'details_of_cast_crew',
+        'requisite_documents'
+    ]),
+
+    8: Object.freeze([]),
+
+    9: Object.freeze([]),
+});

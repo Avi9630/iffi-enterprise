@@ -1,6 +1,6 @@
 import { comparePassword, hashPassword } from '../utills/bcrypt.js';
 import clientRepository from '../queries/client.repository.js';
-import { generateToken, verifyToken } from '../utills/jwt.js';
+// import { generateToken, verifyToken } from '../utills/jwt.js';
 import twoAuthService from './twoAuth.service.js';
 import AppError from '../utills/AppError.js';
 import { sendMail } from '../mail/mailer.js';
@@ -141,7 +141,11 @@ class ClientService {
 
     async resendActivateToken(email) {
 
-        const client = await clientRepository.findByEmail(email);
+        const client = await authr.findByEmail(email);
+        
+        console.log(client);
+        return;
+
         if (!client) {
             throw new AppError('Email not registered with us. Please register.!', 404);
         }

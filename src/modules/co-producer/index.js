@@ -1,0 +1,1 @@
+export { default as coProducerRoutes } from './co-producer.routes.js'

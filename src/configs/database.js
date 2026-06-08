@@ -120,8 +120,4 @@ class Database {
     }
 }
 
-// const database = new Database();
-// export default database;
-// export const prisma = database.client;
-
 export const database = new Database();

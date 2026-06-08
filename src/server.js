@@ -1,24 +1,24 @@
-import { config, database, logger } from "../src/configs/index.js"
+import { config, database, logger, redisClient } from "../src/configs/index.js"
 import app from "./app.js";
 
 const PORT = config.port;
 
 const start = async () => {
 
-    // DATABASE CONNECTION;
-    await database.connect();
+    await database.connect();   // DATABASE CONNECTION;
+    await redisClient.connect();    // RedisConnect();
 
-    // START HTTP SERVER;
+    // START HTTP SERVER
     const server = app.listen(PORT, () => {
         logger.info(`Server running in ${config.env} mode on port ${PORT}`);
     });
 
-    // SHUTDOWN DATABASE;
+    // SHUTDOWN DATABASE CONNECTIONS ON EXIT;
     const shutdown = async (signal) => {
         logger.info(`${signal} received — shutting down gracefully`);
-
         server.close(async () => {
             await database.disconnect();
+            await redisClient.disconnect();
             logger.info('Server closed');
             process.exit(0);
         });
@@ -31,7 +31,7 @@ const start = async () => {
 
     process.on('SIGINT', () => shutdown('SIGINT'));
     process.on('SIGTERM', () => shutdown('SIGTERM'));
-    
+
     process.on('unhandledRejection', (err) => {
         logger.error(`Unhandled rejection: ${err.message}`);
         server.close(() => process.exit(1));

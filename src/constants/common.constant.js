@@ -1,3 +1,8 @@
+export const WEBSITE_TYPE = Object.freeze({
+    IP: 1,
+    OTT: 2,
+    CMOT: 3
+});
 
 export const ROLES = Object.freeze({
     USER: 'user',
@@ -30,3 +35,4 @@ export const ERROR_CODES = Object.freeze({
     CONFLICT: 'conflict',
     INTERNAL_ERROR: 'internal_server_error',
 });
+

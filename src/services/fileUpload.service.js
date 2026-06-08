@@ -1,5 +1,5 @@
 import documentRepository from "../queries/document.repository.js";
-import constant from "../constants/constant.js";
+import { IP_DOCUMENT_TYPE } from "../constants/index.js";
 import AppError from "../utills/AppError.js";
 import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
@@ -21,7 +21,7 @@ class FileUploadService {
         for (const file of files) {
 
             const fieldName = file.fieldname.toUpperCase();
-            const documentType = constant.DOCUMENT_TYPE[fieldName];
+            const documentType = IP_DOCUMENT_TYPE[fieldName];
 
             if (documentType === undefined) {
                 throw new AppError('Envalid document key.!', 422);
