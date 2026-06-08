@@ -1,8 +1,9 @@
 import documentRepository from '../../queries/document.repository.js';
 import STEP_FIELD_MAP from '../../constants/formStepFields.js';
-import ipRepository from "../../queries/ip/ip.repository.js";
 import fileUploadService from '../fileUpload.service.js';
 import AppError from "../../utills/AppError.js";
+import { IP_STEP_FIELD_MAP } from '../../utills/index.js';
+import ipRepository from '../../modules/ip-app/ip.repository.js';
 
 class IpService {
 
@@ -20,6 +21,7 @@ class IpService {
 
         return entry;
     }
+
     async store(payload) {
 
         const dataToStore = {
@@ -30,7 +32,8 @@ class IpService {
             year: new Date().getFullYear()
         };
 
-        const currentStepFields = STEP_FIELD_MAP[payload.step] || [];
+        const currentStepFields = IP_STEP_FIELD_MAP[payload.step] || [];
+
         currentStepFields.forEach(field => {
             if (payload[field] !== undefined) {
                 dataToStore[field] = payload[field];
@@ -113,7 +116,7 @@ class IpService {
 
         const entry = await this.checkExists(id, clientId);
         const deleted = await ipRepository.delete(id);
-             
+
 
         // Delete all local files if documents exist
         if (deleted) {

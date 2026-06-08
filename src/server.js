@@ -1,67 +1,40 @@
-import logger from "./configs/logger.js";
-import prisma from './configs/prisma.js'
-import env from "./configs/env.js";
-import dotenv from 'dotenv';
+import { config, database, logger, redisClient } from "../src/configs/index.js"
 import app from "./app.js";
 
-dotenv.config();
+const PORT = config.port;
 
-const PORT = env.PORT;
+const start = async () => {
 
-async function startServer() {
-    try {
+    await database.connect();   // DATABASE CONNECTION;
+    await redisClient.connect();    // RedisConnect();
 
-        await prisma.$connect();
-        logger.info('✅ Database connected successfully');
+    // START HTTP SERVER
+    const server = app.listen(PORT, () => {
+        logger.info(`Server running in ${config.env} mode on port ${PORT}`);
+    });
 
-        // Start server
-        const server = app.listen(PORT, () => {
-            logger.info(`🚀 Server running on port ${PORT} in ${env.NODE_ENV} mode`);
+    // SHUTDOWN DATABASE CONNECTIONS ON EXIT;
+    const shutdown = async (signal) => {
+        logger.info(`${signal} received — shutting down gracefully`);
+        server.close(async () => {
+            await database.disconnect();
+            await redisClient.disconnect();
+            logger.info('Server closed');
+            process.exit(0);
         });
 
-        const gracefulShutdown = async (signal) => {
+        setTimeout(() => {
+            logger.error('Forced shutdown after timeout');
+            process.exit(1);
+        }, 10_000);
+    };
 
-            logger.info(`${signal} received. Starting graceful shutdown...`);
+    process.on('SIGINT', () => shutdown('SIGINT'));
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
 
-            server.close(async () => {
-                logger.info('HTTP server closed');
-
-                try {
-                    await prisma.$disconnect();
-                    logger.info('Database connection closed');
-                    process.exit(0);
-                } catch (error) {
-                    logger.error('Error during shutdown', { error: error.message });
-                    process.exit(1);
-                }
-            });
-
-            setTimeout(() => {
-                logger.error('Could not close connections in time, forcefully shutting down');
-                process.exit(1);
-            }, 10000);
-        };
-
-        // Event handlers
-        process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-        process.on('SIGINT', () => gracefulShutdown('SIGINT'));
-
-        process.on('unhandledRejection', (reason, promise) => {
-            logger.error('Unhandled Rejection:', { promise, reason });
-            gracefulShutdown('unhandledRejection');
-        });
-        process.on('uncaughtException', (error) => {
-            logger.error('Uncaught Exception:', { error: error.message, stack: error.stack });
-            gracefulShutdown('uncaughtException');
-        });
-
-    } catch (error) {
-        logger.error('❌ Failed to start server', {
-            error: error.message,
-            stack: error.stack
-        });
-        process.exit(1);
-    }
+    process.on('unhandledRejection', (err) => {
+        logger.error(`Unhandled rejection: ${err.message}`);
+        server.close(() => process.exit(1));
+    });
 }
-
-startServer();
+start();

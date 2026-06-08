@@ -1,0 +1,1 @@
+export { default as ipRoutes } from './ip.routes.js';
