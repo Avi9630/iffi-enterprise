@@ -10,8 +10,6 @@ router.use(authMiddleware.verifyToken);
 
 const upload = multer();
 
-// IP APPLICATION-FORM
-
 router
     .post('/add-form', validateRequest(ipValidator.entryFormSchema()), ipController.addForm)
 
@@ -20,24 +18,5 @@ router
     .get('/get-form/:id', ipController.getForm)
 
     .delete('/delete-form/:id', ipController.deleteForm)
-
-//IP - CO-PRODUCERS
-
-// router.post('/add-co-producer',
-//     upload.any(),
-//     validateRequest(coProducerValidator.addCoProducerSchema()),
-//     coProducerController.addCoProducer
-// );
-
-// router.put('/update-co-producer/:id',
-//     upload.any(),
-//     validateRequest(coProducerValidator.updateCoProducerSchema()),
-//     coProducerController.updateCoProducer
-// );
-
-// router
-//     .get('/get-co-producer/:type/:id', coProducerController.masterData)
-//     .delete('/delete-co-producer/:id', coProducerController.deleteForm)
-
 
 export default router;

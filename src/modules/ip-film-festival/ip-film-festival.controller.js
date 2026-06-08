@@ -1,24 +1,19 @@
-import coProducerService from "./co-producer.service.js";
 import ApiResponse from "../../utills/ApiResponse.js";
 import AppError from "../../utills/AppError.js";
 import { WEBSITE_TYPE } from "../../constants/common.constant.js";
+import ipFilmFestivalService from "./ip-film-festival.service.js";
 
-class CoProducerController {
+class IpFilmFestivalController {
 
-    async addCoProducer(req, res, next) {
+    async addFilmFestival(req, res, next) {
         try {
 
-            const allFiles = Object.values(req.files).flat();
-            const payload = {
-                ...req.body,
-                clientId: req.clientDetails.id,
-                files: allFiles,
-            };
+            const payload = { ...req.body, clientId: req.clientDetails.id };
 
-            const result = await coProducerService.store(payload);
+            const result = await ipFilmFestivalService.store(payload);
 
             return ApiResponse(res, 201, {
-                message: "Co-producer(s) added successfully.!",
+                message: "Ip FIlm Festival added successfully.!",
                 data: result
             });
         } catch (error) {
@@ -26,21 +21,16 @@ class CoProducerController {
         }
     }
 
-    async updateCoProducer(req, res, next) {
+    async updateFilmFestival(req, res, next) {
         try {
-            const allFiles = Object.values(req.files).flat();
-            const { id } = req.params;
-            const payload = {
-                ...req.body,
-                clientId: req.clientDetails.id,
-                id,
-                files: allFiles,
-            };
 
-            const result = await coProducerService.update(payload);
+            const { id } = req.params;
+            const payload = { ...req.body, clientId: req.clientDetails.id, id };
+            
+            const result = await ipFilmFestivalService.update(payload);
 
             return ApiResponse(res, 201, {
-                message: "Co-producer(s) updated successfully.!",
+                message: "Ip Film festival updated successfully.!",
                 data: result
             });
         } catch (error) {
@@ -53,7 +43,7 @@ class CoProducerController {
             const { id } = req.params;
             const clientId = req.clientDetails.id;
 
-            const form = await coProducerService.getForm(id, clientId);
+            const form = await ipFilmFestivalService.getForm(id, clientId);
 
             return ApiResponse(res, 200, {
                 message: "Form retrieved successfully!",
@@ -69,10 +59,10 @@ class CoProducerController {
             const { id } = req.params;
             const clientId = req.clientDetails.id;
 
-            await coProducerService.deleteCoProducerById(id, clientId);
+            await ipFilmFestivalService.deleteFilmFestival(id, clientId);
 
             return ApiResponse(res, 200, {
-                message: "Co producer deleted successfully!",
+                message: "Film festival deleted successfully!",
             });
         } catch (error) {
             next(error);
@@ -140,4 +130,4 @@ class CoProducerController {
 
 }
 
-export default new CoProducerController();
+export default new IpFilmFestivalController();

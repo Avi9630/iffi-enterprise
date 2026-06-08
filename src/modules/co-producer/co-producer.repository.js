@@ -54,6 +54,7 @@ class CoProducerRepository {
     }
 
     async findByIdWithDoc(id) {
+
         const coProducer = await prisma.ip_co_producers.findFirst({
             where: { id }
         });
@@ -63,7 +64,7 @@ class CoProducerRepository {
         const documents = await prisma.documents.findMany({
             where: {
                 context_id: coProducer.id,
-                document_type: { in: [17, 13] }
+                document_type: { in: [18, 13] }
             }
         });
 

@@ -17,4 +17,7 @@ router.use('/ip-app', ipRoutes)
 import { coProducerRoutes } from '../modules/co-producer/index.js'
 router.use('/ip/co-producer', coProducerRoutes)
 
+import {ipFilmFestivalRoutes} from '../modules/ip-film-festival/index.js'
+router.use('/ip/film-festival', ipFilmFestivalRoutes);
+
 export default router

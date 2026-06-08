@@ -2,6 +2,7 @@ import coProducerRepository from './co-producer.repository.js';
 import fileUploadHelper from '../../utills/index.js';
 import AppError from "../../utills/AppError.js";
 import { WEBSITE_TYPE } from '../../constants/common.constant.js';
+import commonRepository from '../common/common.repository.js';
 
 const PRODUCER_DOCUMENT_MAP = Object.freeze([
     'co_producer_id_proof',
@@ -14,13 +15,22 @@ class CoProducerService {
 
         const entry = await coProducerRepository.validateIpForm(payload.ip_application_form_id, payload.clientId);
         if (!entry) {
-            throw new AppError('Ip entries not found.! Please enter valid application Id', 404);
+            throw new AppError('Application entries not found.!', 404);
         }
 
         if (entry.client_id.toString() !== payload.clientId.toString()) {
-            throw new AppError('Unauthorized: You can only add co-producers to your own forms', 403);
+            throw new AppError('Unauthorized: You can only add/Update co-producers to your own forms', 403);
         }
+        return entry;
 
+    }
+
+    async _existingCoProducer(id) {
+        const existingCoProducer = await coProducerRepository.findByIdWithDoc(id);
+        if (!existingCoProducer) {
+            throw new AppError("Co-producer entry not found!!", 404);
+        }
+        return existingCoProducer;
     }
 
     async store(payload) {
@@ -52,7 +62,7 @@ class CoProducerService {
             throw new AppError('Something went wrong', 400);
         }
 
-        // File allowed or not
+        // File 
         if (files?.length > 0) {
 
             const allowedDocuments = PRODUCER_DOCUMENT_MAP;
@@ -76,24 +86,29 @@ class CoProducerService {
                 throw new AppError('Something went wrong during document upload.', 409);
             }
         }
+
         return coProducer;
     }
 
     async update(payload) {
 
-        const { id, files } = payload;
+        const { id, clientId, files, ip_application_form_id } = payload;
 
         await this._validateIpForm(payload);
 
-        const existingCoProducer = await coProducerRepository.findByFormId(id);
+        const existingCoProducer = await this._existingCoProducer(id);
 
-        if (!existingCoProducer) {
-            throw new AppError("Co-producer entry not found!!", 404);
-        }
-
-        if (parseInt(existingCoProducer.ip_application_form_id) !== parseInt(payload.ip_application_form_id)) {
+        if (parseInt(existingCoProducer.ip_application_form_id) !== parseInt(ip_application_form_id)) {
             throw new AppError("Unauthorized: This record does not belong to your form.", 403);
         }
+
+        // const existingCoProducer = await coProducerRepository.findByFormId(id);
+        // if (!existingCoProducer) {
+        //     throw new AppError("Co-producer entry not found!!", 404);
+        // }
+        // if (parseInt(existingCoProducer.ip_application_form_id) !== parseInt(payload.ip_application_form_id)) {
+        //     throw new AppError("Unauthorized: This record does not belong to your form.", 403);
+        // }
 
         const dataToStore = {
             ip_application_form_id: BigInt(payload.ip_application_form_id),
@@ -143,31 +158,14 @@ class CoProducerService {
         return coProducerUpdated;
     }
 
-    async getFormById(id, clientId) {
+    async getForm(id, clientId) {
 
-        const existingCoProducer = await coProducerRepository.findByIdWithDoc(id);
-        if (!existingCoProducer) {
-            throw new AppError("Co-producer entry not found!!", 404);
-        }
+        const existingCoProducer = await this._existingCoProducer(id);
 
-        const form = await ipRepository.findById(existingCoProducer.ip_application_form_id, clientId);
-        if (!form) {
-            throw new AppError('Co-producer entry not belongs to you.!', 404);
-        }
-
-        return existingCoProducer;
-    }
-
-    async getFormByIpApplication(id, clientId) {
-
-        const form = await ipRepository.findById(id, clientId);
-        if (!form) {
-            throw new AppError('Co-producer entry not belongs to you.!', 404);
-        }
-
-        const existingCoProducer = await coProducerRepository.getAllCoProducerByIpFormId(id);
-        if (!existingCoProducer) {
-            throw new AppError("Co-producer entry not found!!", 404);
+        const payload = { ip_application_form_id: existingCoProducer.ip_application_form_id, clientId };
+        const ipApplication = await this._validateIpForm(payload);
+        if (parseInt(existingCoProducer.ip_application_form_id) !== parseInt(ipApplication.id)) {
+            throw new AppError("Unauthorized: This record does not belong to your form.", 403);
         }
 
         return existingCoProducer;
@@ -175,17 +173,8 @@ class CoProducerService {
 
     async deleteCoProducerById(id, clientId) {
 
-        const existingCoProducer = await coProducerRepository.findByIdWithDoc(id);
-        if (!existingCoProducer) {
-            throw new AppError("Co-producer entry not found!!", 404);
-        }
-
-        const form = await ipRepository.findById(existingCoProducer.ip_application_form_id, clientId);
-
-        if (!form) {
-            throw new AppError("Unauthorized: This record does not belong to your form.", 403);
-        }
-
+        const existingCoProducer = await this.getForm(id, clientId);
+                
         const deleted = await coProducerRepository.delete(existingCoProducer.id);
 
         // Delete all local files if documents exist
@@ -194,17 +183,33 @@ class CoProducerService {
             const { documents } = existingCoProducer;
 
             if (documents.length) {
+                
                 await Promise.all(
                     documents.map(docuemt => fileUploadHelper.removeLocally(docuemt))
                 );
 
                 // Delete all document records from DB
-                await documentRepository.deleteMany(
+                await commonRepository.deleteMany(
                     documents.map(doc => Number(doc.id))
                 );
             }
         }
     }
+
+    // async getFormByIpApplication(id, clientId) {
+
+    //     const form = await ipRepository.findById(id, clientId);
+    //     if (!form) {
+    //         throw new AppError('Co-producer entry not belongs to you.!', 404);
+    //     }
+
+    //     const existingCoProducer = await coProducerRepository.getAllCoProducerByIpFormId(id);
+    //     if (!existingCoProducer) {
+    //         throw new AppError("Co-producer entry not found!!", 404);
+    //     }
+
+    //     return existingCoProducer;
+    // }
 
 }
 

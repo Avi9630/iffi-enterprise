@@ -12,7 +12,6 @@ const upload = multer();
 
 router.post('/add',
     upload.any(),
-    // validateRequest(coProducerValidator.paramsSchema(), 'params'),
     validateRequest(coProducerValidator.addCoProducerSchema(), 'body'),
     coProducerController.addCoProducer
 );
@@ -24,8 +23,8 @@ router.patch('/update/:id',
 );
 
 router
-    .get('/get-co-producer/:type/:id', coProducerController.masterData)
-    .delete('/delete-co-producer/:id', coProducerController.deleteForm)
+    .get('/get-by/:id', coProducerController.getForm)
 
+    .delete('/delete/:id', coProducerController.deleteForm)
 
 export default router;

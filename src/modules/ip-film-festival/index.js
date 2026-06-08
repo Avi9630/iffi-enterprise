@@ -1,0 +1,1 @@
+export { default as ipFilmFestivalRoutes } from './ip-film-festival.routes.js'
