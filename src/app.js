@@ -1,8 +1,9 @@
 import { authLimiter, errorMiddleware, globalLimiter } from '../src/middlewares/index.js'
 import { config } from '../src/configs/index.js';
+import { fileURLToPath } from 'url';
+
 import AppError from './utills/AppError.js';
 import compression from 'compression';
-import { fileURLToPath } from 'url';
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -36,13 +37,13 @@ const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // app.use(express.static(path.join(__dirname, 'public')));
 
-// Rate Limiting----------------------------------------------------
+// Rate Limiting-------------------------------------------------
 app.use(globalLimiter);
 if (config.env === 'development' || config.env === 'production') {
     app.use('/api/v2/auth', authLimiter);
 }
 
-// Routes
+// Routes-------------------------------------------------
 import testingRoutes from './routes/testing.route.js';
 import routes from './routes/index.js';
 
