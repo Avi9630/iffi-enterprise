@@ -12,7 +12,7 @@ const upload = multer();
 
 router.post('/add',
     upload.any(),
-    validateRequest(coProducerValidator.addCoProducerSchema(), 'body'),
+    validateRequest(coProducerValidator.addCoProducerSchema()),
     coProducerController.addCoProducer
 );
 

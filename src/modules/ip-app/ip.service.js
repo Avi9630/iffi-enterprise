@@ -67,7 +67,6 @@ class IpService {
                 dataToStore[field] = payload[field];
             }
         });
-
         return await ipRepository.create(dataToStore);
     }
 
@@ -109,9 +108,6 @@ class IpService {
 
         // Sanitize all data types before sending to Prisma const
         const sanitizedData = await this._sanitizePayload(dataToUpdate);
-
-        // console.log(sanitizedData);
-        // return;
 
         const dbData = await ipRepository.updateById(payload.id, sanitizedData);
         if (!dbData) {
@@ -221,11 +217,6 @@ class IpService {
         });
         return converted;
     }
-
-    // async getClientForms(client_id) {
-    // return await ipRepository.findByClientId(client_id);
-    // }
-
 }
 
 export default new IpService();

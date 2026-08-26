@@ -1,4 +1,4 @@
-import commonRepository from "../modules/common/common.repository.js";
+import documentRepository from "../modules/shared/document.repository.js";
 import { IP_DOCUMENT_TYPE } from "../constants/index.js";
 import { config } from "../configs/config.js";
 import AppError from "../utills/AppError.js";
@@ -42,8 +42,7 @@ class FileUploadHelper {
                 document_type: documentType,
             };
 
-            const documentDetails = await commonRepository.checkExisting(criteria);
-
+            const documentDetails = await documentRepository.checkExisting(criteria);
             if (documentDetails) {
                 await this.removeLocally(documentDetails);
             }
@@ -54,7 +53,7 @@ class FileUploadHelper {
                 modified_name: fileDetails.modifiedName,
                 doc_path: localResult.fullPath,
             };
-            const uploadResult = await commonRepository.saveAndUpdate(criteria, fileData);
+            const uploadResult = await documentRepository.saveAndUpdate(criteria, fileData);
             console.log(uploadResult);
             uploadedFiles.push(uploadResult);
         }

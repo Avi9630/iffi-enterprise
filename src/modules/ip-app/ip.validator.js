@@ -752,7 +752,7 @@ class IpValidator {
         });
     }
 
-    getSchemaForStep(step) {
+    getSchemaForStep(step) {                
         const schemas = {
             [IP_FORM_STEPS.FILM_DETAILS]: this.filmDetailsSchema(),
             [IP_FORM_STEPS.PRODUCERS_DETAILS]: this.producerDetailsSchema(),
