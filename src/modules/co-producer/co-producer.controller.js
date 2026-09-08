@@ -1,7 +1,5 @@
 import coProducerService from "./co-producer.service.js";
 import ApiResponse from "../../utills/ApiResponse.js";
-import AppError from "../../utills/AppError.js";
-import { WEBSITE_TYPE } from "../../constants/common.constant.js";
 
 class CoProducerController {
 

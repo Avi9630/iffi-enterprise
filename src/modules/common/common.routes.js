@@ -1,8 +1,8 @@
 
-import express from 'express'
-import commonController from './common.controller.js';
 import { validateRequest } from '../../middlewares/index.js';
+import commonController from './common.controller.js';
 import commonValidator from './common.validator.js';
+import express from 'express'
 
 const router = express.Router();
 

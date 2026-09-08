@@ -1,26 +1,26 @@
 import { authLimiter, errorMiddleware, globalLimiter } from '../src/middlewares/index.js'
-import { config } from '../src/configs/index.js';
+import { config, logger } from '../src/configs/index.js';
+import { fileURLToPath } from 'url';
+
 import AppError from './utills/AppError.js';
 import compression from 'compression';
-import { fileURLToPath } from 'url';
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
 import path from 'path';
 
-const __filename = fileURLToPath(import.meta.url);
-
 const app = express();
 
-app.use(helmet()); //// SECURITY HEADER
+app.use(helmet()); // SECURITY HEADER
 
-app.use(cors()); ////CORS
+app.use(cors()); //CORS
 
+// cors({ origin: ['https://your-frontend.com'] })
 //app.options('/*', cors());
 
 // HTTP logger
-if (config.env !== 'test') {
+if (config.nodeEnv !== 'test') {
     app.use(morgan('dev'));
 }
 
@@ -31,23 +31,26 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 // Compression
 app.use(compression());
 
-// ── Static — uploaded images (swap this base path for CDN later) ──────────────
+//  Static — uploaded images
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // app.use(express.static(path.join(__dirname, 'public')));
 
-// Rate Limiting----------------------------------------------------
+// Rate Limiting-------------------------------------------------
 app.use(globalLimiter);
-if (config.env === 'development' || config.env === 'production') {
+
+if (config.nodeEnv === 'staging' || config.nodeEnv === 'production') {
     app.use('/api/v2/auth', authLimiter);
 }
 
-// Routes
+// Routes-------------------------------------------------
 import testingRoutes from './routes/testing.route.js';
-import routes from './routes/index.js';
-
 app.use('/', testingRoutes);
-app.use('/api/v2', routes);
+
+import routes from './routes/index.js';
+app.use('/api/v2/', routes);
 
 // ✅ 404 Handler (must be after all routes)
 app.use((req, res, next) => {

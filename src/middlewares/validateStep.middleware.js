@@ -14,11 +14,11 @@ class ValidateStepMiddleware {
             const { step } = req.body;
 
             if (!step) {
-                return res.status(400).json({
+                return res.status(422).json({
                     status: false,
-                    message: "Validation error",
+                    message: "Validation failed!",
                     errors: {
-                        step: "step is required"
+                        step: "step is required.!"
                     }
                 });
             }

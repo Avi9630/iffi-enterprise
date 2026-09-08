@@ -3,16 +3,22 @@ import dotenv from 'dotenv';
 import path from 'path';
 import Joi from "joi";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url)); // Current directory of the file
+
+dotenv.config();
+
+// {
+//     path: path.join(__dirname, '../../.env'),
+//     quiet: true
+// }
+
 const NODE_ENV = process.env.NODE_ENV ?? 'development';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: path.join(__dirname, `../../.env.${NODE_ENV}`), quiet: true });
-
-// dotenv.config();
+const envFilePath = path.join(__dirname, `../../.env.${NODE_ENV}`);
+const result = dotenv.config({ path: envFilePath, quiet: true });
 
 const envSchema = Joi.object({
 
-    NODE_ENV: Joi.string().valid('local', 'development', 'production').required('development'),
+    NODE_ENV: Joi.string().valid('development', 'staging', 'production').required('development'),
     PORT: Joi.number().default(3000),
 
     // /----DATABASE URL ---------------------------------------------------------
@@ -65,14 +71,14 @@ if (error) {
 
 export const config = {
 
-    env: env.NODE_ENV,
+    nodeEnv: env.NODE_ENV,
     port: env.PORT,
 
     recaptchaSecretKey: env.RECAPTCHA_SECRET_KEY,
     databaseUrl: env.DATABASE_URL,
     basePath: env.BASE_PATH,
     frontendUrl: env.FRONTEND_URL,
-    
+
     ipClosingTime: env.IP_CLOSING_TIME,
     ottClosingTime: env.OTT_CLOSING_TIME,
     cmotClosingTime: env.CMOT_CLOSING_TIME,

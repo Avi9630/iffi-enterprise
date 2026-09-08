@@ -18,9 +18,9 @@ export default (schema, property = "body") => {
                 formattedErrors[field] = err.message.replace(/"/g, "");
             });
 
-            return res.status(400).json({
+            return res.status(422).json({
                 status: false,
-                message: "Validation error",
+                message: "Validation failed.!",
                 errors: formattedErrors
             });
         }

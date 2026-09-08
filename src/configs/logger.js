@@ -1,8 +1,7 @@
-import winston from 'winston';
 import { config } from './config.js';
+import winston from 'winston';
 
-const isDev = ['development', 'production', 'local'].includes(config.env);
-
+const isDev = ['development', 'staging'].includes(config.nodeEnv); //'production'
 
 const jsonFormat = winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
@@ -15,13 +14,10 @@ const consoleFormat = winston.format.combine(
     winston.format.colorize(),
     winston.format.timestamp({ format: 'HH:mm:ss' }),
     winston.format.printf(({ timestamp, level, message, ...meta }) => {
-
         let msg = `${timestamp} [${level}]: ${message}`;
-
         if (Object.keys(meta).length > 0) {
             msg += ` ${JSON.stringify(meta, null, 2)}`;
         }
-
         return msg;
     })
 );
@@ -29,14 +25,13 @@ const consoleFormat = winston.format.combine(
 const logger = winston.createLogger({
 
     level: isDev ? 'debug' : 'info',
-    // level: config.env === 'development' ? 'debug' : 'info',
+    
     format: jsonFormat,
 
     transports: [
 
         new winston.transports.Console({
             format: isDev ? consoleFormat : jsonFormat,
-            // format: config.env === 'development' ? consoleFormat : logFormat,
         }),
 
         new winston.transports.File({

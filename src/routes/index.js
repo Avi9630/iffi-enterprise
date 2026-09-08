@@ -1,7 +1,6 @@
 import express from 'express'
 const router = express.Router()
 
-
 import commonRoutes from '../modules/common/common.routes.js'
 router.use('/common-data', commonRoutes)
 

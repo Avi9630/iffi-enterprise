@@ -39,7 +39,6 @@ class AuthService {
         }
 
         const client = await this._createClient(payload);
-
         if (!client) {
             throw new AppError('Unable to register client.!', 404);
         }
@@ -86,19 +85,19 @@ class AuthService {
                 connect: { id: existsClientType.id }
             }
         }
+
         return await authRepo.create(clientData);
     }
 
     async loginClient(payload) {
 
         const client = await authRepo.findByEmail(payload.email);
-
         if (!client) {
-            throw new AppError("Invalid email entered.!!", 404);
+            throw new AppError("Invalid email entered.!", 404);
         }
 
         if (client.status === 2) {
-            throw new AppError("Account not activated.!!", 422);
+            throw new AppError("Account not activated.!", 422);
         }
 
         if (client.status === 3) {
@@ -146,9 +145,8 @@ class AuthService {
     async accountActivate(token) {
 
         const client = await authRepo.findClientByActivationToken(token);
-
         if (!client) {
-            throw new AppError("Account not found.!", 404);
+            throw new AppError("Account not found.! OR Account already activated.! OR Please connect our support.!", 404);
         }
 
         if (client.status == 3) {
@@ -191,7 +189,6 @@ class AuthService {
     async resendActivateToken(email) {
 
         const client = await authRepo.findByEmail(email);
-
         if (!client) {
             throw new AppError('Email not registered with us. Please register.!', 404);
         }

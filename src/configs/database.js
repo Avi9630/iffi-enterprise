@@ -1,8 +1,7 @@
-import { PrismaClient } from '@prisma/client';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
-
-import logger from './logger.js';
+import { PrismaClient } from '@prisma/client';
 import { config } from './config.js';
+import logger from './logger.js';
 
 class Database {
 

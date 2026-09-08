@@ -1,8 +1,9 @@
+import documentRepository from "../../modules/shared/document.repository.js";
 import coProducerRepository from './co-producer.repository.js';
-import fileUploadHelper from '../../utills/index.js';
-import AppError from "../../utills/AppError.js";
 import { WEBSITE_TYPE } from '../../constants/common.constant.js';
 import commonRepository from '../common/common.repository.js';
+import fileUploadHelper from '../../utills/index.js';
+import AppError from "../../utills/AppError.js";
 
 const PRODUCER_DOCUMENT_MAP = Object.freeze([
     'co_producer_id_proof',
@@ -56,7 +57,7 @@ class CoProducerService {
             registration_details: payload.registration_details ?? null,
             name_of_producers: payload.name_of_producers ?? null,
         };
-
+                        
         const coProducer = await coProducerRepository.create(dataToStore);
         if (!coProducer) {
             throw new AppError('Something went wrong', 400);
@@ -189,28 +190,13 @@ class CoProducerService {
                 );
 
                 // Delete all document records from DB
-                await commonRepository.deleteMany(
+                
+                await documentRepository.deleteMany(
                     documents.map(doc => Number(doc.id))
                 );
             }
         }
     }
-
-    // async getFormByIpApplication(id, clientId) {
-
-    //     const form = await ipRepository.findById(id, clientId);
-    //     if (!form) {
-    //         throw new AppError('Co-producer entry not belongs to you.!', 404);
-    //     }
-
-    //     const existingCoProducer = await coProducerRepository.getAllCoProducerByIpFormId(id);
-    //     if (!existingCoProducer) {
-    //         throw new AppError("Co-producer entry not found!!", 404);
-    //     }
-
-    //     return existingCoProducer;
-    // }
-
 }
 
 export default new CoProducerService();

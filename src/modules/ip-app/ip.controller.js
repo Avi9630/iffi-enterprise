@@ -1,14 +1,18 @@
-import { config } from "../../configs/index.js";
 import { checkCloseTime } from "../../helpers/index.js";
+
 import ApiResponse from "../../utills/ApiResponse.js"
+
+import { config } from "../../configs/index.js";
+
 import AppError from "../../utills/AppError.js";
+
 import ipService from './ip.service.js'
 
 class IpController {
 
     async addForm(req, res, next) {
         try {
-
+            
             if (checkCloseTime(config.ipClosingTime)) {
                 throw new AppError('IP submission has been closed.', 400);
             }
@@ -47,8 +51,10 @@ class IpController {
                 id,
                 files: allFiles,
             };
+            
             // console.log(payload);
             // return
+
             const result = await ipService.update(payload);
 
             return ApiResponse(res, 200, {
