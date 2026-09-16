@@ -12,18 +12,12 @@ class IpController {
 
     async addForm(req, res, next) {
         try {
-            
+
             if (checkCloseTime(config.ipClosingTime)) {
                 throw new AppError('IP submission has been closed.', 400);
             }
 
-            const payload = {
-                ...req.body,
-                client: req.clientDetails
-            };
-
-            // console.log(payload);
-            // return;
+            const payload = { ...req.body, client: req.clientDetails };
 
             const result = await ipService.store(payload);
 
@@ -51,12 +45,11 @@ class IpController {
                 id,
                 files: allFiles,
             };
-            
+
             // console.log(payload);
-            // return
+            // return;
 
             const result = await ipService.update(payload);
-
             return ApiResponse(res, 200, {
                 message: "Form updated successfully!",
                 data: result

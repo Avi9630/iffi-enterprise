@@ -1,8 +1,9 @@
-import documentRepository from "../modules/shared/document.repository.js";
 import { IP_DOCUMENT_TYPE } from "../constants/index.js";
 import { config } from "../configs/config.js";
-import AppError from "../utills/AppError.js";
 import { fileURLToPath } from 'url';
+
+import documentRepository from "../modules/shared/document.repository.js";
+import AppError from "../utills/AppError.js";
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -48,6 +49,7 @@ class FileUploadHelper {
             }
 
             const localResult = await this._saveToLocal(file.buffer, fileDetails.modifiedName, fileDetails.directory);
+
             const fileData = {
                 doc_name: fileDetails.originalName,
                 modified_name: fileDetails.modifiedName,
@@ -93,7 +95,8 @@ class FileUploadHelper {
     async removeLocally(documentDetails) {
 
         const fileUrl = documentDetails.doc_path;
-        const relativePath = fileUrl.replace(process.env.BASE_PATH, '');
+        const relativePath = fileUrl.replace(config.basePath, '');
+        // const relativePath = fileUrl.replace(process.env.BASE_PATH, '');
         const oldFilePath = path.join(process.cwd(), 'public', relativePath);
 
         try {

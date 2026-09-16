@@ -1,5 +1,21 @@
 import { ERROR_CODES } from '../constants/index.js'
 
+class AppError extends Error {
+    constructor(message, statusCode = 500, errors = null) {
+        super(message);
+        this.name = 'AppError';
+        this.statusCode = statusCode;
+        this.status = false;
+        this.errors = errors;
+
+        // this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
+        // this.isOperational = true;
+        // Error.captureStackTrace(this, this.constructor);
+    }
+}
+
+export default AppError;
+
 // class AppError extends Error {
 
 //     constructor(message, statusCode, errorCode) {
@@ -21,15 +37,3 @@ import { ERROR_CODES } from '../constants/index.js'
 //         return map[statusCode] ?? ERROR_CODES.INTERNAL_ERROR;
 //     }
 // }
-
-class AppError extends Error {
-    constructor(message, statusCode) {
-        super(message);
-        this.statusCode = statusCode;
-        this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
-        this.isOperational = true;
-        Error.captureStackTrace(this, this.constructor);
-    }
-}
-
-export default AppError;

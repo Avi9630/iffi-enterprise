@@ -1,8 +1,8 @@
 import documentRepository from "../../modules/shared/document.repository.js";
-import coProducerRepository from './co-producer.repository.js';
+import fileUploadHelper from "../../helpers/fileUpload.helper.js";
 import { WEBSITE_TYPE } from '../../constants/common.constant.js';
+import coProducerRepository from './co-producer.repository.js';
 import commonRepository from '../common/common.repository.js';
-import fileUploadHelper from '../../utills/index.js';
 import AppError from "../../utills/AppError.js";
 
 const PRODUCER_DOCUMENT_MAP = Object.freeze([

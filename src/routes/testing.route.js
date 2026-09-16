@@ -3,12 +3,12 @@ import { redisClient } from '../configs/redis.js';
 
 const router = Router();
 
-router.get('/live', (_req, res) => {
+router.get('/live', (req, res) => {
     res.status(200).json({ status: 'ok', uptime: process.uptime() });
 });
 
-router.get('/', (req, resp) => {
-    resp.json({
+router.get('/', (req, res) => {
+    res.json({
         status: true,
         message: 'IFFI Enterprise API Running'
     });

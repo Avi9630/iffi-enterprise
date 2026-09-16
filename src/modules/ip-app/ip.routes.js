@@ -1,6 +1,6 @@
 import { authMiddleware, validateRequest, validateStep } from '../../middlewares/index.js';
-import ipValidator from './ip.validator.js';
 import ipController from './ip.controller.js';
+import ipValidator from './ip.validator.js';
 import express from 'express';
 import multer from 'multer';
 
@@ -11,10 +11,11 @@ router.use(authMiddleware.verifyToken);
 const upload = multer();
 
 router
-    .post('/add-form', validateRequest(ipValidator.entryFormSchema()), ipController.addForm)
 
-    .patch('/update-form/:id', upload.any(), validateStep.validateByStep, ipController.updateForm)
-    
+    .post('/add', validateRequest(ipValidator.entryFormSchema()), ipController.addForm)
+
+    .patch('/update/:id', upload.any(), validateStep.validateByStep, ipController.updateForm)
+
     .get('/get-form/:id', ipController.getForm)
 
     .delete('/delete-form/:id', ipController.deleteForm)

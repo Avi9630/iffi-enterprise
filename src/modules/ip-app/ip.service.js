@@ -1,8 +1,8 @@
+import { IP_STEP_DOCUMENT_MAP, IP_STEP_FIELD_MAP, WEBSITE_TYPE } from '../../constants/index.js';
 import documentRepository from '../../queries/document.repository.js';
 import ipRepository from '../../modules/ip-app/ip.repository.js';
-import { IP_STEP_DOCUMENT_MAP, IP_STEP_FIELD_MAP, WEBSITE_TYPE } from '../../constants/index.js';
-import fileUploadHelper from '../../utills/index.js';
 import AppError from "../../utills/AppError.js";
+import fileUploadHelper from '../../helpers/fileUpload.helper.js';
 
 const NUMERIC_FIELDS = new Set([
     'step',
@@ -52,6 +52,12 @@ class IpService {
 
     async store(payload) {
 
+        // Count number if projects of client
+        const numberOfProjects = await ipRepository.projectCountByYear(payload.client.id);
+        if (numberOfProjects >= 2) {
+            throw new AppError('You are allowed to file only 2 forms this year.', 400);
+        }
+
         const dataToStore = {
             client_id: payload.client.id,
             step: payload.step,
@@ -73,20 +79,16 @@ class IpService {
     async update(payload) {
 
         const { id, client, files } = payload;
-        const existingForm = await this._checkExists(id, client.id);
 
+        const existingForm = await this._checkExists(id, client.id);
         if (existingForm.step === 9) {
             throw new AppError("Changes not allowed.! Form already submitted.", 403);
         }
 
         const currentStep = parseInt(payload.step, 10);
+        let dataToUpdate = { client_id: payload.client.id, step: currentStep };
+
         const stepFields = IP_STEP_FIELD_MAP[currentStep] || [];
-
-        let dataToUpdate = {
-            client_id: payload.client.id,
-            step: currentStep,
-        };
-
         stepFields.forEach(field => {
             dataToUpdate[field] = payload[field] ?? null;
         });
@@ -108,8 +110,9 @@ class IpService {
 
         // Sanitize all data types before sending to Prisma const
         const sanitizedData = await this._sanitizePayload(dataToUpdate);
+        // const dbData = await ipRepository.updateById(payload.id, sanitizedData);
 
-        const dbData = await ipRepository.updateById(payload.id, sanitizedData);
+        const dbData = await ipRepository.updateById(payload.id, dataToUpdate);
         if (!dbData) {
             throw new AppError('Something went wrong during update.!', 409);
         }
@@ -117,7 +120,8 @@ class IpService {
         // File allowed or not
         if (files?.length > 0) {
 
-            const allowedDocuments = IP_STEP_DOCUMENT_MAP[currentStep] || [];
+            // const allowedDocuments = IP_STEP_DOCUMENT_MAP[7] || [];
+            const allowedDocuments = (IP_STEP_DOCUMENT_MAP[currentStep] || []).map(file => file.field);
 
             for (const file of files) {
                 if (!allowedDocuments.includes(file.fieldname)) {
@@ -186,15 +190,13 @@ class IpService {
     }
 
     async _sanitizePayload(data) {
-        const sanitized = {};
 
+        const sanitized = {};
         for (const [key, value] of Object.entries(data)) {
+
             if (value === undefined) continue;
 
-            if (value === null) {
-                sanitized[key] = null;
-                continue;
-            }
+            if (value === null) { sanitized[key] = null; continue; }
 
             if (BOOLEAN_FIELDS.has(key)) {
                 sanitized[key] = Boolean(value);  // 1→true, 0→false, true→true

@@ -11,7 +11,7 @@ class CommonController {
     async masterData(req, res, next) {
         try {
 
-            const { type } = req.params;
+            const { type } = req.params;            
             const data = await this.handlers(type, req);
             return ApiResponse(res, 200, { message: "Success.!", data });
 
@@ -23,7 +23,7 @@ class CommonController {
     async handlers(type, req) {
         const handle = {
             'client-type-list': () => commonRepository.clientTypeList(),
-            'client-list':() => commonRepository.clientList(),
+            'client-list': () => commonRepository.clientList(),
             'language-list': () => commonRepository.languageList(),
             'genre': () => commonRepository.genreList(),
             'country': () => commonRepository.countryList(),

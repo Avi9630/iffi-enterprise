@@ -92,6 +92,21 @@ class IpRepository extends BaseRepository {
         }
     }
 
+    async projectCountByYear(clientId) {
+        const ipApplicationModel = await this.getModel('ip_application_forms');
+        const currentYear = new Date().getFullYear();
+        const count = ipApplicationModel.count({
+            where: {
+                client_id: clientId,
+                year: currentYear
+            }
+        });
+        return count;
+
+        // return currentYear;
+        // return ipApplicationModel.findFirst({ where: { id, client_id: clientId } });
+    }
+
     // async findByClientId(client_id) {
     //     return await prisma.ip_application_forms.findMany({
     //         where: { client_id },

@@ -23,11 +23,15 @@ class RedisClient {
         });
 
         this.client.on('connect', () => {
-            logger.info('Redis connected');
+            logger.info('✅ Redis connected successfully');
         });
 
         this.client.on('error', (err) => {
-            logger.error(err.message);
+            // logger.error(err.message);
+            logger.error('❌ Redis connection failed', {
+                error: err.message,
+                stack: err.stack
+            });
         });
 
         this.client.connect(); // IMPORTANT
@@ -38,7 +42,7 @@ class RedisClient {
         if (this.client) {
             await this.client.quit();
             this.client = null;
-            logger.info('Redis disconnected');
+            logger.info('✅ Redis disconnected');
         }
     }
 

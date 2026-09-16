@@ -44,17 +44,17 @@ class AuthService {
         }
 
         // Send verification email //DON'T DELETE THIS CODE-------------------------------
-
-        // await sendMail({
-        //     to: client.email,
-        //     subject: "Verify Your Registration for IFFI Goa",
-        //     templateName: "registration.ejs",
-        //     context: {
-        //         client_name: client.first_name + ' ' + client.last_name,
-        //         frontend_base_url: config.frontendUrl,
-        //         activate_token: client.activation_token
-        //     }
-        // });
+        
+        await sendMail({
+            to: client.email,
+            subject: "Verify Your Registration for IFFI Goa",
+            templateName: "registration.ejs",
+            context: {
+                client_name: client.first_name + ' ' + client.last_name,
+                frontend_base_url: config.frontendUrl,
+                activate_token: client.activation_token
+            }
+        });
 
         return {
             id: client.id,
@@ -194,26 +194,25 @@ class AuthService {
         }
 
         if (client.status == 3) {
-            throw new AppError("Account blocked by ADMIN. Please contact our support!!", 422);
+            throw new AppError("Account blocked by ADMIN. Please contact our support.!", 422);
         }
 
         const activationToken = await generateActivationToken(email);
-
         client.activation_token = activationToken;
 
         await authRepo.updateClientById(client.id, client);
 
-        // await sendMail({
-        //     to: client.email,
-        //     subject: "Welcome to the International Film Festival of India!",
-        //     templateName: "registration.ejs",
-        //     context: {
-        //         client_name: client.first_name + ' ' + client.last_name,
-        //         client_email: client.email,
-        //         frontend_base_url: config.frontendUrl,
-        //         activate_token: client.activation_token
-        //     }
-        // });
+        await sendMail({
+            to: client.email,
+            subject: "Welcome to the International Film Festival of India.!",
+            templateName: "registration.ejs",
+            context: {
+                client_name: client.first_name + ' ' + client.last_name,
+                client_email: client.email,
+                frontend_base_url: config.frontendUrl,
+                activate_token: client.activation_token
+            }
+        });
 
     }
 
@@ -230,17 +229,17 @@ class AuthService {
             otpCodes = await this.sendOtp(email, client, ip);
         }
 
-        // await sendMail({
-        //     to: client.email,
-        //     subject: "OTP Send",
-        //     templateName: "registration.ejs",
-        //     context: {
-        //         client_name: client.first_name + ' ' + client.last_name,
-        //         frontend_base_url: process.env.FRONTEND_URL,
-        //         activate_token: client.activate_token,
-        //         otp: otpCodes.otp
-        //     }
-        // });
+        await sendMail({
+            to: client.email,
+            subject: "OTP Send",
+            templateName: "registration.ejs",
+            context: {
+                client_name: client.first_name + ' ' + client.last_name,
+                frontend_base_url: process.env.FRONTEND_URL,
+                activate_token: client.activate_token,
+                otp: otpCodes.otp
+            }
+        });
 
         return otpCodes;
     }

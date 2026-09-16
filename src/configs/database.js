@@ -69,7 +69,7 @@ class Database {
 
         process.on('SIGINT', async () => {
 
-            logger.info('SIGINT received');
+            logger.info('SIGINT received — shutting down gracefully');
 
             await this.disconnect();
 
@@ -78,7 +78,7 @@ class Database {
 
         process.on('SIGTERM', async () => {
 
-            logger.info('SIGTERM received');
+            logger.info('SIGTERM received — shutting down gracefully');
 
             await this.disconnect();
 

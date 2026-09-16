@@ -29,7 +29,7 @@ export const IP_DOCUMENT_TYPE = Object.freeze({
     UPLOAD_CV: 16,
     UPLOAD_REEL: 17,
     CO_PRODUCER_ID_PROOF: 18,
-    REQUISITE_DOCUMENTS:19
+    REQUISITE_DOCUMENTS: 19
 });
 
 export const IP_STEP_FIELD_MAP = Object.freeze({
@@ -66,14 +66,16 @@ export const IP_STEP_FIELD_MAP = Object.freeze({
         'producer_website',
         'producer_address',
         'company_is_registered_as_indian_entity',
-        'is_address_same_as_producer',
+
         // Return address fields (conditional)
+        'is_address_same_as_producer',
         'return_address_name',
         'return_address_email',
         'return_address_landline',
         'return_address_mobile',
         'return_address_fax',
         'return_address',
+
         // Right holder fields (conditional)
         'whether_indian_foreign_right_holder_same',
         'right_holder_name',
@@ -137,44 +139,154 @@ export const IP_STEP_FIELD_MAP = Object.freeze({
     9: Object.freeze([]),
 });
 
+// export const IP_STEP_DOCUMENT_MAP = Object.freeze({
+
+//     1: Object.freeze([
+
+//     ]),
+
+//     2: Object.freeze([
+//         'producer_id_proof'
+//     ]),
+
+//     3: Object.freeze([
+//         'director_id_proof'
+//     ]),
+
+//     4: Object.freeze([
+//     ]),
+
+//     5: Object.freeze([
+//         'file_cbfc_certificate',
+//         'declaration_clause_file',
+//         'uncensored_file',
+//     ]),
+
+//     6: Object.freeze([
+
+//     ]),
+
+//     7: Object.freeze([
+//         'authorization_latter',
+//         'declaration_latter',
+//         'synopsis_in_english',
+//         'directors_profile',
+//         'producers_profile',
+//         'details_of_cast_crew',
+//         'requisite_documents'
+//     ]),
+
+//     8: Object.freeze([]),
+
+//     9: Object.freeze([]),
+// });
+
 export const IP_STEP_DOCUMENT_MAP = Object.freeze({
 
-    1: Object.freeze([
-        
-    ]),
-
     2: Object.freeze([
-        'producer_id_proof'
+        {
+            field: 'producer_id_proof',
+            required: false,
+            maxSize: 5 * 1024 * 1024, // 5 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
     ]),
 
     3: Object.freeze([
-        'director_id_proof'
+        {
+            field: 'director_id_proof',
+            required: true,
+            maxSize: 5 * 1024 * 1024, // 5 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
     ]),
 
-    4: Object.freeze([
-    ]),
+    // 4: Object.freeze([
+    //     {
+    //         field: 'file_cbfc_certificate',
+    //         required: true,
+    //         maxSize: 5 * 1024 * 1024,
+    //         allowedMimeTypes: ['application/pdf'],
+    //     },
+    //     {
+    //         field: 'declaration_clause_file',
+    //         required: false,
+    //         maxSize: 5 * 1024 * 1024,
+    //         allowedMimeTypes: ['application/pdf'],
+    //     },
+    //     {
+    //         field: 'uncensored_file',
+    //         required: false,
+    //         maxSize: 5 * 1024 * 1024,
+    //         allowedMimeTypes: ['application/pdf'],
+    //     }
+    // ]),
 
     5: Object.freeze([
-        'file_cbfc_certificate',
-        'declaration_clause_file',
-        'uncensored_file',
-    ]),
-
-    6: Object.freeze([
-        
+        {
+            field: 'file_cbfc_certificate',
+            required: true,
+            maxSize: 5 * 1024 * 1024, // 5 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
+        {
+            field: 'declaration_clause_file',
+            required: true,
+            maxSize: 5 * 1024 * 1024, // 5 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
+        {
+            field: 'uncensored_file',
+            required: true,
+            maxSize: 5 * 1024 * 1024, // 5 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
     ]),
 
     7: Object.freeze([
-        'authorization_latter',
-        'declaration_latter',
-        'synopsis_in_english',
-        'directors_profile',
-        'producers_profile',
-        'details_of_cast_crew',
-        'requisite_documents'
+        {
+            field: 'authorization_latter',
+            required: true,
+            // maxSize: 100 * 1024 * 1024, // 100 MB
+            maxSize: 5 * 1024 * 1024, // 5 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
+        {
+            field: 'declaration_latter',
+            required: true,
+            maxSize: 5 * 1024 * 1024, // 100 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
+        {
+            field: 'synopsis_in_english',
+            required: true,
+            maxSize: 5 * 1024 * 1024, // 100 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
+        {
+            field: 'directors_profile',
+            required: true,
+            maxSize: 5 * 1024 * 1024, // 100 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
+        {
+            field: 'producers_profile',
+            required: true,
+            maxSize: 5 * 1024 * 1024, // 100 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
+        {
+            field: 'details_of_cast_crew',
+            required: true,
+            maxSize: 5 * 1024 * 1024, // 100 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
+        {
+            field: 'requisite_documents',
+            required: true,
+            maxSize: 5 * 1024 * 1024, // 100 MB
+            allowedMimeTypes: ['application/pdf'],
+        },
     ]),
 
-    8: Object.freeze([]),
-
-    9: Object.freeze([]),
 });

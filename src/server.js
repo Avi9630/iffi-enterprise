@@ -6,7 +6,7 @@ const PORT = config.port;
 const start = async () => {
 
     await database.connect();       // DATABASE CONNECTION;
-    await redisClient.connect();    // RedisConnect();
+    await redisClient.connect();    // RedisConnect(); // Don't remove this line
 
     // START HTTP SERVER
     const server = app.listen(PORT, () => {
@@ -15,14 +15,14 @@ const start = async () => {
 
     // SHUTDOWN DATABASE CONNECTIONS ON EXIT;
     const shutdown = async (signal) => {
-            
+
         logger.info(`${signal} received — shutting down gracefully`);
-        
+
         server.close(async () => {
 
             await database.disconnect();
-            await redisClient.disconnect();
-            
+            await redisClient.disconnect(); //Don't remove this line
+
             logger.info('Server closed');
             process.exit(0);
         });

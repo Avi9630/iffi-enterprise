@@ -1,7 +1,7 @@
 import ipValidator from "../modules/ip-app/ip.validator.js";
-import validateRequest from "./validate.middleware.js";
-import { IP_FORM_STEPS } from "../constants/index.js";
-import AppError from "../utills/index.js";
+import { validateRequest } from "./validate.middleware.js";
+import { IP_FORM_STEPS, IP_STEP_DOCUMENT_MAP } from "../constants/index.js";
+import AppError from "../utills/AppError.js";
 
 class ValidateStepMiddleware {
 
@@ -11,8 +11,10 @@ class ValidateStepMiddleware {
 
     async validateByStep(req, res, next) {
         try {
+
             const { step } = req.body;
 
+            // Check step
             if (!step) {
                 return res.status(422).json({
                     status: false,
@@ -23,6 +25,7 @@ class ValidateStepMiddleware {
                 });
             }
 
+            // Validate valide step
             const validSteps = Object.values(IP_FORM_STEPS);
             if (!validSteps.includes(Number(step))) {
                 return res.status(400).json({
@@ -34,24 +37,41 @@ class ValidateStepMiddleware {
                 });
             }
 
-            // const fileErrors = this.validateFiles(Number(step), req.files || []);
-            // if (Object.keys(fileErrors).length > 0) {
-            //     return res.status(400).json({
+            // const fileValidationError = await this.validateStepFiles(Number(step), req.files || []);
+            // if (Object.keys(fileValidationError).length > 0) {
+            //     return res.status(422).json({
             //         status: false,
-            //         message: "Validation error",
-            //         errors: fileErrors
+            //         message: 'Validation failed.!',
+            //         errors: fileValidationError,
             //     });
             // }
 
+            // Get Joi schema || Fields to validate...!
             const schema = ipValidator.getSchemaForStep(Number(step));
 
-            // if (!schema) {
-            //     throw new AppError("Validation error", 400, {
-            //         step: `No validation schema defined for step ${step}`
-            //     });
-            // }
+            if (!schema) {
+                throw new AppError('Validation error', 400, {
+                    step: `No validation schema defined for step ${step}`
+                });
+            }
+            // return validateRequest(schema)(req, res, next);
 
-            return validateRequest(schema)(req, res, next);
+            return validateRequest(schema)(req, res,
+                async () => {
+
+                    const fileValidationError = await this.validateStepFiles(Number(step), req.files || []);
+
+                    if (Object.keys(fileValidationError).length > 0) {
+                        return res.status(422).json({
+                            status: false,
+                            message: 'Validation failed.!',
+                            errors: fileValidationError,
+                        });
+                    }
+
+                    next();
+                }
+            );
 
         } catch (error) {
             if (error instanceof AppError) {
@@ -66,52 +86,53 @@ class ValidateStepMiddleware {
         }
     };
 
-    validateFiles(step, files = []) {
+    async validateStepFiles(step, files) {
 
-        const fileRules = {
-            [IP_FORM_STEPS.PRODUCERS_DETAILS]: [
-                'producer_id_proof'
-            ],
-
-            // [IP_FORM_STEPS.DIRECTORS_DETAILS]: [
-            //     'director_id_proof'
-            // ],
-
-            // Example future steps
-            [IP_FORM_STEPS.CBFC_CERTIFICATION]: [
-                'file_cbfc_certificate',
-                'declaration_clause_file',
-                'uncensored_file'
-            ],
-
-            [IP_FORM_STEPS.DOCUMENTS]: [
-                'authorization_latter',
-                'declaration_latter',
-                'synopsis_in_english',
-                'directors_profile',
-                'producers_profile',
-                'details_of_cast_crew',
-            ]
-        };
-
-        const requiredFiles = fileRules[step] || [];
+        const fileRules = IP_STEP_DOCUMENT_MAP[step] || [];
 
         const errors = {};
+        
+        // Check required file
 
-        requiredFiles.forEach(field => {
+        for (const fileRule of fileRules) {
 
-            const exists = files.some(
-                file => file.fieldname === field
+            const matchingFiles = files.filter(
+                file => file.fieldname === fileRule.field
             );
 
-            if (!exists) {
-                errors[field] = `${field} is required`;
+            if (fileRule.required && matchingFiles.length === 0) {
+                errors[fileRule.field] = `${fileRule.field} is required`;
+                continue;
             }
 
-        });
+            // Validate uploaded files
+            for (const file of matchingFiles) {
 
+                // File type validation
+                if (fileRule.allowedMimeTypes && !fileRule.allowedMimeTypes.includes(file.mimetype)) {
+                    errors[fileRule.field] = `${fileRule.field} has invalid file type`;
+                }
+
+                // File size validation
+                if (fileRule.maxSize && file.size > fileRule.maxSize) {
+                    errors[fileRule.field] = `${fileRule.field} exceeds the allowed file size`;
+                }
+            }
+        }
+
+        // Check unexpected files
+        const allowedFields = fileRules.map(
+            fileRule => fileRule.field
+        );
+
+        for (const file of files) {
+
+            if (!allowedFields.includes(file.fieldname)) {
+                errors[file.fieldname] = `${file.fieldname} is not allowed for step ${step}`;
+            }
+        }
         return errors;
-    }
+    };
 
 }
 export default new ValidateStepMiddleware();

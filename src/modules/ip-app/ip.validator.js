@@ -1,4 +1,5 @@
 import Joi from "joi";
+
 import { IP_FORM_STEPS } from "../../constants/index.js";
 
 class IpValidator {
@@ -345,10 +346,9 @@ class IpValidator {
             // Required only when producer_is = 1
             firm_is_owned_by_individual: Joi.when("producer_is", {
                 is: 1,
-                then: Joi.number()
-                    .valid(0, 1)
-                    .required(),
-                otherwise: Joi.optional()
+                then: Joi.number().valid(0, 1).required(),
+                otherwise: Joi.number().valid(0, 1).optional()
+                // otherwise: Joi.optional()
             }),
 
             producer_email: Joi.string()
@@ -443,7 +443,7 @@ class IpValidator {
                 is: 0,
                 then: Joi.string().required(),
                 otherwise: Joi.optional()
-            }),            
+            }),
             // producer_id_proof: Joi.any()
         });
     }
@@ -456,38 +456,38 @@ class IpValidator {
                 .required(),
 
             // director_name: Joi.string()
-            //     .trim()
-            //     .required(),
+            // .trim()
+            // .required(),
 
             // director_email: Joi.string()
-            //     .trim()
-            //     .email()
-            //     .required(),
+            // .trim()
+            // .email()
+            // .required(),
 
             // director_landline: Joi.string()
-            //     .trim()
-            //     .allow('', null),
+            // .trim()
+            // .allow('', null),
 
             // director_mobile: Joi.string()
-            //     .trim()
-            //     .required(),
+            // .trim()
+            // .required(),
 
             // director_fax: Joi.string()
-            //     .trim()
-            //     .allow('', null),
+            // .trim()
+            // .allow('', null),
 
             // director_website: Joi.string()
-            //     .trim()
-            //     .uri()
-            //     .allow('', null),
+            // .trim()
+            // .uri()
+            // .allow('', null),
 
             // director_address: Joi.string()
-            //     .trim()
-            //     .required(),
+            // .trim()
+            // .required(),
 
             // director_indian_natinality: Joi.number()
-            //     .valid(1)
-            //     .required(),
+            // .valid(1)
+            // .required(),
 
             // director_id_proof: Joi.object().required()
 
@@ -575,7 +575,7 @@ class IpValidator {
                 .required(),
 
             // Required when value = 1
-            
+
             date_of_cbfc_certificate: Joi.when(
                 'film_is_certified_by_cbfc_or_uncensored',
                 {
@@ -642,21 +642,21 @@ class IpValidator {
             // Uncomment if needed
             /*
             name_of_festival: Joi.string().when('film_screened', {
-                is: 1,
-                then: Joi.required(),
-                otherwise: Joi.optional()
+            is: 1,
+            then: Joi.required(),
+            otherwise: Joi.optional()
             }),
-        
+            
             address_of_festival: Joi.string().when('film_screened', {
-                is: 1,
-                then: Joi.required(),
-                otherwise: Joi.optional()
+            is: 1,
+            then: Joi.required(),
+            otherwise: Joi.optional()
             }),
-        
+            
             date_of_festival: Joi.string().when('film_screened', {
-                is: 1,
-                then: Joi.date().format('YYYY-MM-DD').required(),
-                otherwise: Joi.optional()
+            is: 1,
+            then: Joi.date().format('YYYY-MM-DD').required(),
+            otherwise: Joi.optional()
             }),
             */
 
@@ -671,9 +671,9 @@ class IpValidator {
             // Uncomment if needed
             /*
             date_of_release_india: Joi.string().when('film_screened_inside_india', {
-                is: 1,
-                then: Joi.date().format('YYYY-MM-DD').required(),
-                otherwise: Joi.optional()
+            is: 1,
+            then: Joi.date().format('YYYY-MM-DD').required(),
+            otherwise: Joi.optional()
             }),
             */
 
@@ -683,15 +683,15 @@ class IpValidator {
             // Uncomment if needed
             /*
             name_of_country: Joi.string().when('film_screened_outside_india', {
-                is: 1,
-                then: Joi.required(),
-                otherwise: Joi.optional()
+            is: 1,
+            then: Joi.required(),
+            otherwise: Joi.optional()
             }),
-        
+            
             date_of_release_outside: Joi.string().when('film_screened_outside_india', {
-                is: 1,
-                then: Joi.date().format('YYYY-MM-DD').required(),
-                otherwise: Joi.optional()
+            is: 1,
+            then: Joi.date().format('YYYY-MM-DD').required(),
+            otherwise: Joi.optional()
             }),
             */
 
@@ -702,9 +702,9 @@ class IpValidator {
             // Uncomment if needed
             /*
             name_of_compentitaion_festival: Joi.string().when('film_participated_compentitaion', {
-                is: 1,
-                then: Joi.required(),
-                otherwise: Joi.optional()
+            is: 1,
+            then: Joi.required(),
+            otherwise: Joi.optional()
             }),
             */
 
@@ -752,7 +752,7 @@ class IpValidator {
         });
     }
 
-    getSchemaForStep(step) {                
+    getSchemaForStep(step) {
         const schemas = {
             [IP_FORM_STEPS.FILM_DETAILS]: this.filmDetailsSchema(),
             [IP_FORM_STEPS.PRODUCERS_DETAILS]: this.producerDetailsSchema(),
@@ -767,5 +767,459 @@ class IpValidator {
         return schemas[step] || Joi.object();
     }
 }
-
 export default new IpValidator();
+
+
+
+// export const entryFormSchema = Joi.object({
+
+//     step: Joi.number().integer().positive().valid(1).required(),
+
+//     category: Joi.number().valid(1, 2).required(),
+
+//     title_of_film_in_roman: Joi.string().required(),
+
+//     title_of_film_in_devanagari: Joi.string().required(),
+
+//     english_translation_of_film: Joi.string().required(),
+
+//     title_of_script_langauge: Joi.string().required(),
+
+//     language_id: Joi.number().required(),
+
+//     // Conditional: required when language_id is not 5
+//     whether_subtitle_english: Joi.when('language_id', {
+//         is: Joi.not(5),
+//         then: Joi.number().valid(1).required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     // DCP field - required_without based on category
+//     dcp: Joi.when('category', {
+//         is: 1,
+//         then: Joi.number().valid(1, 2, 3).required(),
+//         otherwise: Joi.when('category', {
+//             is: 2,
+//             then: Joi.number().valid(1, 2, 3).when('blueray', {
+//                 is: Joi.exist(),
+//                 then: Joi.optional(),
+//                 otherwise: Joi.when('pendrive', {
+//                     is: Joi.exist(),
+//                     then: Joi.optional(),
+//                     otherwise: Joi.required()
+//                 })
+//             }),
+//             otherwise: Joi.optional()
+//         })
+//     }),
+
+//     blueray: Joi.number().integer().optional(),
+//     pendrive: Joi.number().integer().optional(),
+
+//     // DCP = 1 fields (for both categories)
+//     dci_compliant_jpeg_2000: Joi.when('dcp', {
+//         is: 1,
+//         then: Joi.number().valid(1).when(Joi.ref('subtitle_to_be_burned_in_picture'), {
+//             is: Joi.exist(),
+//             then: Joi.optional(),
+//             otherwise: Joi.when(Joi.ref('dcp_should_cru_hard_disk'), {
+//                 is: Joi.exist(),
+//                 then: Joi.optional(),
+//                 otherwise: Joi.when(Joi.ref('hard_disk_format_ext2_ext3'), {
+//                     is: Joi.exist(),
+//                     then: Joi.optional(),
+//                     otherwise: Joi.required()
+//                 })
+//             })
+//         }),
+//         otherwise: Joi.optional()
+//     }),
+
+//     subtitle_to_be_burned_in_picture: Joi.when('dcp', {
+//         is: 1,
+//         then: Joi.number().valid(1).when(Joi.ref('dcp_should_cru_hard_disk'), {
+//             is: Joi.exist(),
+//             then: Joi.optional(),
+//             otherwise: Joi.when(Joi.ref('hard_disk_format_ext2_ext3'), {
+//                 is: Joi.exist(),
+//                 then: Joi.optional(),
+//                 otherwise: Joi.when(Joi.ref('dci_compliant_jpeg_2000'), {
+//                     is: Joi.exist(),
+//                     then: Joi.optional(),
+//                     otherwise: Joi.required()
+//                 })
+//             })
+//         }),
+//         otherwise: Joi.optional()
+//     }),
+
+//     dcp_should_cru_hard_disk: Joi.when('dcp', {
+//         is: 1,
+//         then: Joi.number().valid(1).when(Joi.ref('hard_disk_format_ext2_ext3'), {
+//             is: Joi.exist(),
+//             then: Joi.optional(),
+//             otherwise: Joi.when(Joi.ref('subtitle_to_be_burned_in_picture'), {
+//                 is: Joi.exist(),
+//                 then: Joi.optional(),
+//                 otherwise: Joi.when(Joi.ref('dci_compliant_jpeg_2000'), {
+//                     is: Joi.exist(),
+//                     then: Joi.optional(),
+//                     otherwise: Joi.required()
+//                 })
+//             })
+//         }),
+//         otherwise: Joi.optional()
+//     }),
+
+//     hard_disk_format_ext2_ext3: Joi.when('dcp', {
+//         is: 1,
+//         then: Joi.number().valid(1).when(Joi.ref('dcp_should_cru_hard_disk'), {
+//             is: Joi.exist(),
+//             then: Joi.optional(),
+//             otherwise: Joi.when(Joi.ref('subtitle_to_be_burned_in_picture'), {
+//                 is: Joi.exist(),
+//                 then: Joi.optional(),
+//                 otherwise: Joi.when(Joi.ref('dci_compliant_jpeg_2000'), {
+//                     is: Joi.exist(),
+//                     then: Joi.optional(),
+//                     otherwise: Joi.required()
+//                 })
+//             })
+//         }),
+//         otherwise: Joi.optional()
+//     }),
+
+//     is_dcp_unencrypted: Joi.when('dcp', {
+//         is: 1,
+//         then: Joi.number().valid(1).required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     // DCP = 2 fields (for both categories)
+//     blueray_region_free_pal: Joi.when('dcp', {
+//         is: 2,
+//         then: Joi.number().valid(1).required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     // DCP = 3 field (only for category 2)
+//     is_pendrive_containing_hd_files: Joi.when('category', {
+//         is: 2,
+//         then: Joi.when('dcp', {
+//             is: 3,
+//             then: Joi.number().valid(1).required(),
+//             otherwise: Joi.optional()
+//         }),
+//         otherwise: Joi.optional()
+//     }),
+
+//     // Value field (required for both categories when category is 1 or 2)
+//     value_of_dcp_or_blueray: Joi.when('category', {
+//         is: Joi.valid(1, 2),
+//         then: Joi.number().min(1).required(),
+//         otherwise: Joi.optional()
+//     })
+// });
+
+// getSchemaForStep(step)  = {
+//     const schemas = {
+//         [IP_FORM_STEPS.FILM_DETAILS]: this.filmDetailsSchema(),
+//         [IP_FORM_STEPS.PRODUCERS_DETAILS]: this.producerDetailsSchema(),
+//         [IP_FORM_STEPS.DIRECTORS_DETAILS]: this.directorsDetailsSchema(),
+//         [IP_FORM_STEPS.CREW_DETAILS]: this.crewDetailsSchema(),
+//         [IP_FORM_STEPS.CBFC_CERTIFICATION]: this.cbfcCertificationSchema(),
+//         [IP_FORM_STEPS.OTHER_DETAILS]: this.otherDetailsSchema(),
+//         [IP_FORM_STEPS.DOCUMENTS]: this.documentsSchema(),
+//         [IP_FORM_STEPS.DECLARATION_PAYMENT]: this.declarationPaymentSchema(),
+//         [IP_FORM_STEPS.SUBMISSION]: this.submissionSchema(),
+//     };
+//     return schemas[step] || Joi.object();
+// }
+
+
+// const validateByStep = Joi.object({
+//     step: Joi.number().integer().positive().valid(1).required(),
+
+//     last_id: Joi.when('step', {
+//         is: Joi.number().equal(1),
+//         then: Joi.optional(),
+//         otherwise: Joi.required(),
+//     }),
+// });
+
+// export default { entryFormSchema}; //validateByStep
+
+// const filmDetailsSchema = Joi.object({
+//     step: Joi.number()
+//         .valid(IP_FORM_STEPS.FILM_DETAILS)
+//         .required(),
+
+//     category: Joi.number()
+//         .valid(1, 2)
+//         .required(),
+
+//     title_of_film_in_roman: Joi.string()
+//         .required(),
+
+//     title_of_film_in_devanagari: Joi.string()
+//         .required(),
+
+//     english_translation_of_film: Joi.string()
+//         .required(),
+
+//     title_of_script_langauge: Joi.string()
+//         .required(),
+
+//     language_id: Joi.number()
+//         .required(),
+
+//     // Conditional: required when language_id is not 5
+//     whether_subtitle_english: Joi.when('language_id', {
+//         is: Joi.not(5),
+//         then: Joi.number().valid(1).required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     // DCP field - required_without based on category
+//     dcp: Joi.when('category', {
+//         is: 1,
+//         then: Joi.number().valid(1, 2, 3).required(),
+//         otherwise: Joi.when('category', {
+//             is: 2,
+//             then: Joi.number().valid(1, 2, 3).when('blueray', {
+//                 is: Joi.exist(),
+//                 then: Joi.optional(),
+//                 otherwise: Joi.when('pendrive', {
+//                     is: Joi.exist(),
+//                     then: Joi.optional(),
+//                     otherwise: Joi.required()
+//                 })
+//             }),
+//             otherwise: Joi.optional()
+//         })
+//     }),
+
+//     blueray: Joi.number().integer().optional(),
+//     pendrive: Joi.number().integer().optional(),
+
+//     // DCP = 1 fields (for both categories)
+//     dci_compliant_jpeg_2000: Joi.when('dcp', {
+//         is: 1,
+//         then: Joi.number().valid(1).when(Joi.ref('subtitle_to_be_burned_in_picture'), {
+//             is: Joi.exist(),
+//             then: Joi.optional(),
+//             otherwise: Joi.when(Joi.ref('dcp_should_cru_hard_disk'), {
+//                 is: Joi.exist(),
+//                 then: Joi.optional(),
+//                 otherwise: Joi.when(Joi.ref('hard_disk_format_ext2_ext3'), {
+//                     is: Joi.exist(),
+//                     then: Joi.optional(),
+//                     otherwise: Joi.required()
+//                 })
+//             })
+//         }),
+//         otherwise: Joi.optional()
+//     }),
+
+//     subtitle_to_be_burned_in_picture: Joi.when('dcp', {
+//         is: 1,
+//         then: Joi.number().valid(1).when(Joi.ref('dcp_should_cru_hard_disk'), {
+//             is: Joi.exist(),
+//             then: Joi.optional(),
+//             otherwise: Joi.when(Joi.ref('hard_disk_format_ext2_ext3'), {
+//                 is: Joi.exist(),
+//                 then: Joi.optional(),
+//                 otherwise: Joi.when(Joi.ref('dci_compliant_jpeg_2000'), {
+//                     is: Joi.exist(),
+//                     then: Joi.optional(),
+//                     otherwise: Joi.required()
+//                 })
+//             })
+//         }),
+//         otherwise: Joi.optional()
+//     }),
+
+//     dcp_should_cru_hard_disk: Joi.when('dcp', {
+//         is: 1,
+//         then: Joi.number().valid(1).when(Joi.ref('hard_disk_format_ext2_ext3'), {
+//             is: Joi.exist(),
+//             then: Joi.optional(),
+//             otherwise: Joi.when(Joi.ref('subtitle_to_be_burned_in_picture'), {
+//                 is: Joi.exist(),
+//                 then: Joi.optional(),
+//                 otherwise: Joi.when(Joi.ref('dci_compliant_jpeg_2000'), {
+//                     is: Joi.exist(),
+//                     then: Joi.optional(),
+//                     otherwise: Joi.required()
+//                 })
+//             })
+//         }),
+//         otherwise: Joi.optional()
+//     }),
+
+//     hard_disk_format_ext2_ext3: Joi.when('dcp', {
+//         is: 1,
+//         then: Joi.number().valid(1).when(Joi.ref('dcp_should_cru_hard_disk'), {
+//             is: Joi.exist(),
+//             then: Joi.optional(),
+//             otherwise: Joi.when(Joi.ref('subtitle_to_be_burned_in_picture'), {
+//                 is: Joi.exist(),
+//                 then: Joi.optional(),
+//                 otherwise: Joi.when(Joi.ref('dci_compliant_jpeg_2000'), {
+//                     is: Joi.exist(),
+//                     then: Joi.optional(),
+//                     otherwise: Joi.required()
+//                 })
+//             })
+//         }),
+//         otherwise: Joi.optional()
+//     }),
+
+//     is_dcp_unencrypted: Joi.when('dcp', {
+//         is: 1,
+//         then: Joi.number().valid(1).required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     // DCP = 2 fields (for both categories)
+//     blueray_region_free_pal: Joi.when('dcp', {
+//         is: 2,
+//         then: Joi.number().valid(1).required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     // DCP = 3 field (only for category 2)
+//     is_pendrive_containing_hd_files: Joi.when('category', {
+//         is: 2,
+//         then: Joi.when('dcp', {
+//             is: 3,
+//             then: Joi.number().valid(1).required(),
+//             otherwise: Joi.optional()
+//         }),
+//         otherwise: Joi.optional()
+//     }),
+
+//     // Value field (required for both categories when category is 1 or 2)
+//     value_of_dcp_or_blueray: Joi.when('category', {
+//         is: Joi.valid(1, 2),
+//         then: Joi.number().min(1).required(),
+//         otherwise: Joi.optional()
+//     })
+// });
+
+// const producerDetailsSchema = Joi.object({
+//     step: Joi.number()
+//         .valid(IP_FORM_STEPS.PRODUCERS_DETAILS)
+//         .required(),
+
+//     producer_is: Joi.number()
+//         .valid(1, 2)
+//         .required(),
+
+//     name_of_firm: Joi.string()
+//         .trim()
+//         .required(),
+
+//     // Required only when producer_is = 1
+//     firm_is_owned_by_individual: Joi.when("producer_is", {
+//         is: 1,
+//         then: Joi.number()
+//             .valid(0, 1)
+//             .required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     producer_email: Joi.string()
+//         .email()
+//         .required(),
+
+//     producer_landline: Joi.string()
+//         .allow("", null),
+
+//     producer_mobile: Joi.string()
+//         .required(),
+
+//     producer_website: Joi.string()
+//         .allow("", null),
+
+//     producer_address: Joi.string()
+//         .required(),
+
+//     company_is_registered_as_indian_entity: Joi.number()
+//         .valid(1)
+//         .required(),
+
+//     is_address_same_as_producer: Joi.number()
+//         .valid(0, 1)
+//         .required(),
+
+//     // Return address fields required only when
+//     // is_address_same_as_producer = 0
+
+//     return_address_name: Joi.when("is_address_same_as_producer", {
+//         is: 0,
+//         then: Joi.string().required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     return_address_email: Joi.when("is_address_same_as_producer", {
+//         is: 0,
+//         then: Joi.string().email().required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     return_address_landline: Joi.string()
+//         .allow("", null),
+
+//     return_address_mobile: Joi.when("is_address_same_as_producer", {
+//         is: 0,
+//         then: Joi.string().required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     return_address_fax: Joi.string()
+//         .allow("", null),
+
+//     return_address: Joi.when("is_address_same_as_producer", {
+//         is: 0,
+//         then: Joi.string().required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     whether_indian_foreign_right_holder_same: Joi.number()
+//         .valid(0, 1)
+//         .required(),
+
+//     // Right holder fields required only when
+//     // whether_indian_foreign_right_holder_same = 0
+
+//     right_holder_name: Joi.when("whether_indian_foreign_right_holder_same", {
+//         is: 0,
+//         then: Joi.string().required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     right_holder_email: Joi.when("whether_indian_foreign_right_holder_same", {
+//         is: 0,
+//         then: Joi.string().email().required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     right_holder_landline: Joi.string()
+//         .allow("", null),
+
+//     right_holder_mobile: Joi.when("whether_indian_foreign_right_holder_same", {
+//         is: 0,
+//         then: Joi.string().required(),
+//         otherwise: Joi.optional()
+//     }),
+
+//     right_holder_fax: Joi.string()
+//         .allow("", null),
+
+//     right_holder_address: Joi.when("whether_indian_foreign_right_holder_same", {
+//         is: 0,
+//         then: Joi.string().required(),
+//         otherwise: Joi.optional()
+//     })
+// });

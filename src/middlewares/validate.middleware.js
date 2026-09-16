@@ -1,14 +1,8 @@
 
-export default (schema, property = "body") => {
-
+export const validateRequest = (schema) => {
     return (req, res, next) => {
 
-        const { error } = schema.validate(req[property], {
-            abortEarly: false,
-            // stripUnknown: true,
-            allowUnknown: true
-        });
-
+        const { error, value } = schema.validate(req.body, { abortEarly: false, allowUnknown: false });
         if (error) {
 
             const formattedErrors = {};
@@ -24,6 +18,7 @@ export default (schema, property = "body") => {
                 errors: formattedErrors
             });
         }
+        req.body = value;
         next();
     };
 };

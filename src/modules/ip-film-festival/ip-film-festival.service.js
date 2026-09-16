@@ -1,5 +1,5 @@
 import coProducerRepository from './ip-film-festival.repository.js';
-import fileUploadHelper from '../../utills/index.js';
+// import fileUploadHelper from '../../utills/index.js';
 import AppError from "../../utills/AppError.js";
 import { WEBSITE_TYPE } from '../../constants/common.constant.js';
 import commonRepository from '../common/common.repository.js';

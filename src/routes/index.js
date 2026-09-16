@@ -1,7 +1,8 @@
 import express from 'express'
 const router = express.Router()
 
-import commonRoutes from '../modules/common/common.routes.js'
+// import commonRoutes from '../modules/common/common.routes.js'
+import { commonRoutes } from '../modules/common/index.js'
 router.use('/common-data', commonRoutes)
 
 import { authRoutes } from '../modules/auth/index.js'
@@ -11,7 +12,7 @@ router.use('/auth', authRoutes)
 // router.use('/client', clientRoutes)
 
 import { ipRoutes } from '../modules/ip-app/index.js'
-router.use('/ip-app', ipRoutes)
+router.use('/ip', ipRoutes)
 
 import { coProducerRoutes } from '../modules/co-producer/index.js'
 router.use('/ip/co-producer', coProducerRoutes)

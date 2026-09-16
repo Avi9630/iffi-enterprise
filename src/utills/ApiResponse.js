@@ -5,7 +5,7 @@ const ApiResponse = (res, statusCode, data) => {
             typeof value === 'bigint' ? value.toString() : value
         )
     );
-
+    console.log(sanitizedData);
     return res.status(statusCode).json({
         status: statusCode < 400,
         ...sanitizedData

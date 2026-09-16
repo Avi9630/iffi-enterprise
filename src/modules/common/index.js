@@ -1,0 +1,1 @@
+export { default as commonRoutes } from './common.routes.js';

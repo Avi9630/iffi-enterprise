@@ -66,7 +66,7 @@ class AuthController {
             const { email } = req.body;
             const result = await authService.resendActivateToken(email);
             return ApiResponse(res, 201, {
-                message: "Please check your email to verify your account.",
+                message: "Please check your email to verify your account.!",
                 data: result
             });
         } catch (error) {
