@@ -182,6 +182,12 @@ model ip_application_forms {
   co_producer_names                         String?           @db.Text
   enclosed_the_declaration_letter           Int?              @db.TinyInt
   submit_time                               DateTime?         @db.Timestamp(0)
+  unique_id                                 String?           @db.VarChar(255)
+  online_link                               String?           @db.VarChar(255)
+  online_password                           String?           @db.VarChar(255)
+  synopsis                                  String?           @db.Text
+  director_note                             String?           @db.Text
+  producer_note                             String?           @db.Text
   year                                      Int?
   status                                    Boolean           @default(false)
   payment_status                            Int               @default(3) @db.TinyInt

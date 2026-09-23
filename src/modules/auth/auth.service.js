@@ -1,6 +1,9 @@
-import authRepo from './auth.repository.js';
 import { config } from '../../configs/config.js';
 import { sendMail } from '../../mail/mailer.js';
+
+import authRepo from './auth.repository.js';
+import { token } from 'morgan';
+
 import {
     AppError,
     comparePassword,
@@ -10,11 +13,10 @@ import {
     hashPassword,
     verifyToken
 } from '../../utills/index.js';
-import { token } from 'morgan';
+
 
 
 class AuthService {
-
 
     async registerClient(payload) {
 
@@ -93,21 +95,21 @@ class AuthService {
 
         const client = await authRepo.findByEmail(payload.email);
         if (!client) {
-            throw new AppError("Invalid email entered.!", 404);
+            throw new AppError("Invalid email entered.!😒", 404);
         }
 
         if (client.status === 2) {
-            throw new AppError("Account not activated.!", 422);
+            throw new AppError("Account not activated.!😒", 422);
         }
 
         if (client.status === 3) {
-            throw new AppError("Account blocked by ADMIN. Please contact our support.!", 422);
+            throw new AppError("Account blocked by ADMIN. Please contact our support.!😒", 422);
         }
 
         const isMatch = await comparePassword(payload.password, client.password_hash);
 
         if (!isMatch) {
-            throw new AppError("Invalid password entered.!!", 422);
+            throw new AppError("Invalid password entered.!😒", 422);
         }
 
         const accessToken = await generateAccessToken(client);

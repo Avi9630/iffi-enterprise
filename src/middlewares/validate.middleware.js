@@ -6,9 +6,9 @@ export const validateRequest = (schema) => {
         if (error) {
 
             const formattedErrors = {};
-
+                        
             error.details.forEach(err => {
-                const field = err.path.join(".");
+                const field = err.path.join(".");               
                 formattedErrors[field] = err.message.replace(/"/g, "");
             });
 

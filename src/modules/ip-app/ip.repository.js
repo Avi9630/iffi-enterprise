@@ -23,7 +23,7 @@ class IpRepository extends BaseRepository {
 
         const ipApplicationModel = await this.getModel('ip_application_forms');
         return ipApplicationModel.findFirst({ where: { id, client_id: clientId } });
-
+        
         // return this._getCached(
         //     `getByIDIp:${id}:${clientId}`,
         //     async () => {
@@ -43,6 +43,7 @@ class IpRepository extends BaseRepository {
     async getByAllSub(id, clientId) {
 
         const ipApplicationModel = await this.getModel('ip_application_forms');
+        
         const entry = await ipApplicationModel.findUnique({ where: { id } });
         if (!entry) return null;
 

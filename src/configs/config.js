@@ -6,16 +6,23 @@ import Joi from "joi";
 const __dirname = path.dirname(fileURLToPath(import.meta.url)); // Current directory of the file
 
 dotenv.config();
+
 // {
 //     path: path.join(__dirname, '../../.env'),
 //     quiet: true
 // }
 
-const NODE_ENV = process.env.NODE_ENV ?? "development";
+// const NODE_ENV = process.env.NODE_ENV ?? "development";
+const NODE_ENV = process.env.NODE_ENV;
 const envFilePath = path.join(__dirname, `../../.env.${NODE_ENV}`);
-const result = dotenv.config({ path: envFilePath, quiet: true });
+
+const result = dotenv.config({ path: envFilePath, quiet: true }); ////This line is for only check all value, comming from .env
+
+// console.log(result);
+
 
 const envSchema = Joi.object({
+
   NODE_ENV: Joi.string().valid("development", "staging", "production").required("development"),
   PORT: Joi.number().default(3000),
 
@@ -59,6 +66,7 @@ const envSchema = Joi.object({
 }).unknown(true).options({ errors: { label: "key" } });
 
 const { error, value: env } = envSchema.validate(process.env);
+
 if (error) {
   throw new Error(`Config validation error: ${error.message}`);
 }

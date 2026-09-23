@@ -107,4 +107,12 @@ const verifyOtpSchema = Joi.object({
         .required(),
 });
 
-export default { registerSchema, verifyEmailSchema, loginSchema, resetPasswordSchema, changePasswordSchema, verifyOtpSchema, sendOtpSchema };
+export default {
+    registerSchema,
+    verifyEmailSchema,
+    loginSchema,
+    resetPasswordSchema,
+    changePasswordSchema,
+    verifyOtpSchema,
+    sendOtpSchema
+};

@@ -1,12 +1,13 @@
 import express from 'express'
 const router = express.Router()
 
+// Auth route
+import { authRoutes } from '../modules/auth/index.js'
+router.use('/auth', authRoutes)
+
 // import commonRoutes from '../modules/common/common.routes.js'
 import { commonRoutes } from '../modules/common/index.js'
 router.use('/common-data', commonRoutes)
-
-import { authRoutes } from '../modules/auth/index.js'
-router.use('/auth', authRoutes)
 
 // import { clientRoutes } from '../modules/client/index.js'
 // router.use('/client', clientRoutes)

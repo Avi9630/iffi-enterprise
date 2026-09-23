@@ -44,7 +44,7 @@ if (config.nodeEnv === "staging" || config.nodeEnv === "production") {
     app.use("/api/v2/auth", authLimiter);
 }
 
-// Routes-------------------------------------------------
+// Testing Routes------------------------------------------------
 import testingRoutes from "./routes/testing.route.js";
 app.use("/", testingRoutes);
 

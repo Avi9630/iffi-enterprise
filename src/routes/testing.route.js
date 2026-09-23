@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { redisClient } from '../configs/redis.js';
 
 const router = Router();
 
@@ -8,9 +7,9 @@ router.get('/live', (req, res) => {
 });
 
 router.get('/', (req, res) => {
-    res.json({
+    res.status(200).json({
         status: true,
-        message: 'IFFI Enterprise API Running'
+        message: 'IFFi Enterprise API Running.!'
     });
 });
 

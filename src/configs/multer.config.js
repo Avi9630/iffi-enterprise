@@ -31,7 +31,6 @@ export const MIME_TYPES = {
     ]
 };
 
-
 const createFileFilter = (allowedMimes) => (req, file, cb) => {
     if (!allowedMimes.includes(file.mimetype)) {
         return cb(

@@ -56,7 +56,6 @@ class FileUploadHelper {
                 doc_path: localResult.fullPath,
             };
             const uploadResult = await documentRepository.saveAndUpdate(criteria, fileData);
-            console.log(uploadResult);
             uploadedFiles.push(uploadResult);
         }
         return uploadedFiles;
@@ -80,6 +79,8 @@ class FileUploadHelper {
         } catch {
             await fs.mkdir(directory, { recursive: true });
         }
+
+        console.log(config.basePath);
 
         const filePath = path.join(directory, filename);
         await fs.writeFile(filePath, buffer);

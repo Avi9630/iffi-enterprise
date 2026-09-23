@@ -27,6 +27,7 @@ class ValidateStepMiddleware {
 
             // Validate valide step
             const validSteps = Object.values(IP_FORM_STEPS);
+
             if (!validSteps.includes(Number(step))) {
                 return res.status(400).json({
                     status: false,
@@ -56,22 +57,19 @@ class ValidateStepMiddleware {
             }
             // return validateRequest(schema)(req, res, next);
 
-            return validateRequest(schema)(req, res,
-                async () => {
+            return validateRequest(schema)(req, res, async () => {
 
-                    const fileValidationError = await this.validateStepFiles(Number(step), req.files || []);
-
-                    if (Object.keys(fileValidationError).length > 0) {
-                        return res.status(422).json({
-                            status: false,
-                            message: 'Validation failed.!',
-                            errors: fileValidationError,
-                        });
-                    }
-
-                    next();
+                const fileValidationError = await this.validateStepFiles(Number(step), req.files || []);
+                                
+                if (Object.keys(fileValidationError).length > 0) {
+                    return res.status(422).json({
+                        status: false,
+                        message: 'Validation failed.!',
+                        errors: fileValidationError,
+                    });
                 }
-            );
+                next();
+            });
 
         } catch (error) {
             if (error instanceof AppError) {
@@ -91,9 +89,8 @@ class ValidateStepMiddleware {
         const fileRules = IP_STEP_DOCUMENT_MAP[step] || [];
 
         const errors = {};
-        
-        // Check required file
 
+        // Check required file
         for (const fileRule of fileRules) {
 
             const matchingFiles = files.filter(

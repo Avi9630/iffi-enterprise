@@ -179,7 +179,7 @@ class IpService {
         const existingEntry = await ipRepository.getById(id, clientId);
 
         if (!existingEntry) {
-            throw new AppError('Entry not found.!', 404);
+            throw new AppError('Entry not found. Or Not belongs to you.!😒', 404);
         }
 
         if (existingEntry.client_id.toString() !== clientId.toString()) {
