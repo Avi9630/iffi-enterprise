@@ -86,21 +86,28 @@ class IpService {
         }
 
         const currentStep = parseInt(payload.step, 10);
+
+        // Date to update
         let dataToUpdate = { client_id: payload.client.id, step: currentStep };
 
+        // Check fields
         const stepFields = IP_STEP_FIELD_MAP[currentStep] || [];
         stepFields.forEach(field => {
             dataToUpdate[field] = payload[field] ?? null;
         });
 
+        this._categoryBasedCleanup(dataToUpdate, currentStep, payload);
+
         if (!existingForm.active_step || existingForm.active_step < currentStep) {
             dataToUpdate.active_step = currentStep;
         }
 
+        //Manage dates fields 
         if (dataToUpdate.step === 5) {
             dataToUpdate = this._convertDateFields(dataToUpdate, ['date_of_cbfc_certificate', 'date_of_completion_production']);
         }
 
+        // Check payment status
         if (dataToUpdate.step === 9) {
             if (existingForm.payment_status !== 1) {
                 throw new AppError("Your payment has not been completed yet.! Please wait till payment success.!.", 403);
@@ -108,10 +115,8 @@ class IpService {
             dataToUpdate.status = true
         }
 
-        // Sanitize all data types before sending to Prisma const
         const sanitizedData = await this._sanitizePayload(dataToUpdate);
         // const dbData = await ipRepository.updateById(payload.id, sanitizedData);
-
         const dbData = await ipRepository.updateById(payload.id, dataToUpdate);
         if (!dbData) {
             throw new AppError('Something went wrong during update.!', 409);
@@ -218,6 +223,16 @@ class IpService {
             }
         });
         return converted;
+    }
+
+    _categoryBasedCleanup(dataToUpdate, currentStep, payload) {
+        if (currentStep === 1) {
+            const category = Number(payload.category);
+            if (category != 4) {
+                dataToUpdate.eligible_for_horizons = null;
+            }
+        }
+        return dataToUpdate;
     }
 }
 

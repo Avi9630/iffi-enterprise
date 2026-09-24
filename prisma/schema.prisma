@@ -86,6 +86,7 @@ model ip_application_forms {
   active_step                               Int?              @db.TinyInt
   client_id                                 BigInt?           @db.UnsignedBigInt
   category                                  Int?
+  eligible_for_horizons                     Boolean?
   title_of_film_in_roman                    String?           @db.VarChar(256)
   title_of_film_in_devanagari               String?           @db.VarChar(256)
   english_translation_of_film               String?           @db.VarChar(256)
@@ -99,11 +100,7 @@ model ip_application_forms {
   dcp_should_cru_hard_disk                  Int?              @db.TinyInt
   hard_disk_format_ext2_ext3                Int?              @db.TinyInt
   is_dcp_unencrypted                        Int?              @db.TinyInt
-  blueray                                   Int?              @db.TinyInt
-  blueray_region_free_pal                   Int?              @db.TinyInt
   value_of_dcp_or_blueray                   Int
-  pendrive                                  Int?              @db.TinyInt
-  is_pendrive_containing_hd_files           Int?              @db.TinyInt
   producer_is                               Int?
   firm_is_owned_by_individual               Int?              @db.TinyInt
   name_of_firm                              String?           @db.VarChar(256)
@@ -173,7 +170,6 @@ model ip_application_forms {
   film_distribution_limited_to_india_only   Int?              @db.TinyInt
   details_of_awards_won_if_any              String?           @db.VarChar(1000)
   requisite_documents                       Int?              @db.TinyInt
-  eligible_for_horizons                     Int?              @db.TinyInt
   duration_running_time_seconds             String?           @db.VarChar(2)
   confirmation_neither_released_nor_planned Int?              @db.TinyInt
   is_ip_award                               Int?              @db.TinyInt

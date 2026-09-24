@@ -5,13 +5,13 @@ import authRepo from './auth.repository.js';
 import { token } from 'morgan';
 
 import {
-    AppError,
-    comparePassword,
-    generateAccessToken,
     generateActivationToken,
     generateRefereshToken,
+    generateAccessToken,
+    comparePassword,
     hashPassword,
-    verifyToken
+    verifyToken,
+    AppError
 } from '../../utills/index.js';
 
 

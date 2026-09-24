@@ -35,22 +35,20 @@ export const IP_STEP_FIELD_MAP = Object.freeze({
 
     1: Object.freeze([
         'category',
+        'eligible_for_horizons',
         'title_of_film_in_roman',
         'title_of_film_in_devanagari',
         'english_translation_of_film',
         'title_of_script_langauge',
         'language_id',
         'whether_subtitle_english',
-        'blueray',
-        'pendrive',
         'dcp',
+        'is_dcp_unencrypted',
         'dci_compliant_jpeg_2000',
         'subtitle_to_be_burned_in_picture',
         'dcp_should_cru_hard_disk',
         'hard_disk_format_ext2_ext3',
-        'is_dcp_unencrypted',
         'blueray_region_free_pal',
-        'is_pendrive_containing_hd_files',
         'value_of_dcp_or_blueray'
     ]),
 
